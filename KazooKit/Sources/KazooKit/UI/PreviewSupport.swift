@@ -15,7 +15,11 @@ public enum PreviewSupport {
         prefs.pinned = pinned ?? Array(providers.prefix(3))
         let cache = MemoryReadingCache()
         var readings = Fixtures.allReadings()
-        for key in readings.keys { readings[key]?.isDemo = false; readings[key]?.sourceLabel = "fixture" }
+        let sources: [ProviderID: String] = [
+            .codex: "oauth", .claude: "oauth", .cursor: "web", .copilot: "api", .gemini: "Gemini CLI",
+            .antigravity: "Antigravity app", .opencode: "web", .openai: "api",
+        ]
+        for key in readings.keys { readings[key]?.isDemo = false; readings[key]?.sourceLabel = sources[key] ?? "api" }
         cache.save(readings)
         let store = UsageStore(
             liveSource: DemoUsageSource(),

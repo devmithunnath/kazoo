@@ -17,13 +17,14 @@ Click to compare providers. Connect everything from a native Mac window — no c
 [Features](#features) •
 [Providers](#supported-providers) •
 [Install](#installation) •
+[Screenshots](#screenshots) •
 [Usage](#usage) •
 [Privacy](#privacy--security) •
 [Development](docs/DEVELOPMENT.md)
 
 <br>
 
-<img src="docs/renders/overview.png" width="560" alt="Kazoo overview panel showing Codex, Claude and OpenAI API usage">
+<img src="docs/screenshots/notch-overview.png" width="760" alt="Kazoo's panel opened from the MacBook notch, comparing Codex, Claude and OpenAI API usage">
 
 </div>
 
@@ -55,11 +56,73 @@ Then open **Kazoo** from Applications. See [Installation](#installation) for oth
   on displays without a notch.
 - **Accessible** — VoiceOver labels on every reading, full keyboard shortcuts, and Reduce Motion support.
 
-<div align="center">
-<img src="docs/renders/detail-claude.png" width="270" alt="Claude detail">
-<img src="docs/renders/detail-cursor.png" width="270" alt="Cursor detail">
-<img src="docs/renders/detail-openai.png" width="270" alt="OpenAI API detail">
-</div>
+## Screenshots
+
+### Always in view
+
+Your favorite provider sits in the notch, with the camera area left clear.
+
+<p align="center">
+  <img src="docs/screenshots/notch-collapsed.png" width="760" alt="Collapsed notch showing Codex, 31% weekly left">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/notch-collapsed-claude.png" width="760" alt="Collapsed notch showing Claude, 24% 5h left">
+  <br>
+  <img src="docs/screenshots/notch-collapsed-openai.png" width="760" alt="Collapsed notch showing OpenAI API, $2.80 today">
+</p>
+
+### Click for details
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/notch-detail-claude.png" alt="Claude detail with 5-hour, weekly and model-specific limits"></td>
+    <td width="50%"><img src="docs/screenshots/notch-all-providers.png" alt="All providers list"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Every window with its own reset; model-specific limits listed separately</sub></td>
+    <td align="center"><sub>All connected providers, in your order</sub></td>
+  </tr>
+</table>
+
+### Every provider, honestly labeled
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/renders/detail-codex.png" width="200" alt="Codex"><br><sub><b>Codex</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-claude.png" width="200" alt="Claude"><br><sub><b>Claude</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-cursor.png" width="200" alt="Cursor"><br><sub><b>Cursor</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-copilot.png" width="200" alt="GitHub Copilot"><br><sub><b>GitHub Copilot</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/renders/detail-gemini.png" width="200" alt="Gemini CLI"><br><sub><b>Gemini CLI</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-antigravity.png" width="200" alt="Antigravity"><br><sub><b>Antigravity</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-opencode.png" width="200" alt="OpenCode"><br><sub><b>OpenCode</b></sub></td>
+    <td align="center"><img src="docs/renders/detail-openai.png" width="200" alt="OpenAI API"><br><sub><b>OpenAI API</b></sub></td>
+  </tr>
+</table>
+
+When a provider is offline or a sign-in expires, Kazoo keeps the last reading, shows its age, and offers one fix:
+
+<p align="center">
+  <img src="docs/renders/stale-codex.png" width="380" alt="Codex detail showing an offline banner with the last reading">
+</p>
+
+### Native setup and settings
+
+<table>
+  <tr>
+    <td width="62%"><img src="docs/screenshots/connections.png" alt="Connections window with Claude connected"></td>
+    <td width="38%"><img src="docs/screenshots/settings.png" alt="Settings window"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Search, connect and recover every provider from one window</sub></td>
+    <td align="center"><sub>Favorite, pinned order, refresh and login options</sub></td>
+  </tr>
+</table>
+
+<sub>Screenshots are rendered from Kazoo's own views using sample data. Regenerate them with
+<code>cd KazooKit &amp;&amp; swift run kazoo-render ../docs/screenshots --screenshots</code>.</sub>
 
 ## Supported providers
 

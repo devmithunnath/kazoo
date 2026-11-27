@@ -5,10 +5,13 @@ public struct ConnectionsView: View {
     @ObservedObject var store: UsageStore
     @Binding var selection: ProviderID?
     @State private var search = ""
+    /// Offscreen captures can't draw the translucent sidebar; screenshots use a solid one instead.
+    private let solidSidebar: Bool
 
-    public init(store: UsageStore, selection: Binding<ProviderID?>) {
+    public init(store: UsageStore, selection: Binding<ProviderID?>, solidSidebar: Bool = false) {
         self.store = store
         self._selection = selection
+        self.solidSidebar = solidSidebar
     }
 
     private var filtered: [ProviderID] {
@@ -16,31 +19,64 @@ public struct ConnectionsView: View {
     }
 
     public var body: some View {
-        NavigationSplitView {
-            List(selection: self.$selection) {
-                if self.store.isDemo {
-                    Label("Demo mode — sample data", systemImage: "sparkles")
-                        .foregroundStyle(.orange)
-                        .font(.callout)
+        Group {
+            if self.solidSidebar {
+                // Screenshot layout: same sidebar and detail, without the system-composited split-view sidebar.
+                HStack(spacing: 0) {
+                    self.sidebar
+                        .frame(width: 270)
+                        .background(Color(white: 0.95))
+                    Divider()
+                    self.detail
                 }
-                ForEach(self.filtered) { provider in
-                    ProviderRow(store: self.store, provider: provider).tag(provider)
-                }
-                if self.filtered.isEmpty {
-                    Text("No provider matches “\(self.search)”.").foregroundStyle(.secondary)
-                }
-            }
-            .searchable(text: self.$search, placement: .sidebar, prompt: "Search providers")
-            .navigationSplitViewColumnWidth(min: 240, ideal: 270)
-        } detail: {
-            if let provider = self.selection {
-                ConnectDetailView(store: self.store, provider: provider)
-                    .id(provider)
             } else {
-                ConnectionsWelcome(store: self.store)
+                NavigationSplitView {
+                    self.sidebar
+                        .navigationSplitViewColumnWidth(min: 240, ideal: 270)
+                } detail: {
+                    self.detail
+                }
             }
         }
         .frame(minWidth: 760, minHeight: 520)
+    }
+
+    private var sidebar: some View {
+        List(selection: self.$selection) {
+            if self.store.isDemo {
+                Label("Demo mode — sample data", systemImage: "sparkles")
+                    .foregroundStyle(.orange)
+                    .font(.callout)
+            }
+            ForEach(self.filtered) { provider in
+                ProviderRow(store: self.store, provider: provider).tag(provider)
+            }
+            if self.filtered.isEmpty {
+                Text("No provider matches “\(self.search)”.").foregroundStyle(.secondary)
+            }
+        }
+        .modifier(SolidSidebar(enabled: self.solidSidebar))
+        .searchable(text: self.$search, placement: .sidebar, prompt: "Search providers")
+    }
+
+    @ViewBuilder private var detail: some View {
+        if let provider = self.selection {
+            ConnectDetailView(store: self.store, provider: provider)
+                .id(provider)
+        } else {
+            ConnectionsWelcome(store: self.store)
+        }
+    }
+}
+
+private struct SolidSidebar: ViewModifier {
+    let enabled: Bool
+    func body(content: Content) -> some View {
+        if self.enabled {
+            content.listStyle(.inset).scrollContentBackground(.hidden).background(Color(white: 0.95))
+        } else {
+            content
+        }
     }
 }
 

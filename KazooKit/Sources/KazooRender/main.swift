@@ -2,7 +2,7 @@ import AppKit
 import KazooKit
 import SwiftUI
 
-// Usage: swift run kazoo-render <output-dir>
+// Usage: swift run kazoo-render <output-dir> [--screenshots]
 @MainActor
 func render(_ view: some View, to url: URL) {
     let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark))
@@ -17,6 +17,12 @@ func render(_ view: some View, to url: URL) {
 @MainActor
 func main() {
     let out = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "renders", isDirectory: true)
+    if CommandLine.arguments.contains("--screenshots") {
+        _ = NSApplication.shared
+        NSApp.setActivationPolicy(.accessory)
+        renderScreenshots(to: out)
+        return
+    }
     try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
     let all = ProviderID.allCases
     let many = PreviewSupport.store(providers: all, pinned: [.codex, .claude, .openai])

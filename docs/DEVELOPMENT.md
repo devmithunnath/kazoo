@@ -40,7 +40,8 @@ panel routing.
 ```bash
 cd KazooKit
 swift run kazoo-probe claude cli          # fetch one live provider, print the normalized reading
-swift run kazoo-render /tmp/kazoo-renders # render every panel state to PNG from fixtures
+swift run kazoo-render ../docs/renders                  # every panel state, from fixtures
+swift run kazoo-render ../docs/screenshots --screenshots # README scenes: notch on a desktop, Connections, Settings
 ```
 
 `kazoo-probe` never prints credentials. Copilot and OpenAI read `KAZOO_COPILOT_TOKEN` and
