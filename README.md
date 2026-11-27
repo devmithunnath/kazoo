@@ -1,161 +1,160 @@
+<div align="center">
+
+<img src="docs/icon.png" width="128" height="128" alt="Kazoo icon">
+
 # Kazoo
 
-Look at your MacBook's notch to see how much AI usage you have left. Click it to compare providers.
-Connect accounts from a normal Mac window. A PipBoxes product.
+**Your AI usage, living in the MacBook notch.**
 
-Kazoo is a native macOS 14+ app written in Swift, SwiftUI and AppKit. It gets provider data from
-[CodexBar](https://github.com/steipete/CodexBar)'s `CodexBarCore` (MIT), pinned to **v0.85.0**
-(`5dd48cab770a326691b25a124d37ffee12c5f7ac`).
+Glance up to see how much Codex, Claude, Cursor, Copilot, Gemini, OpenCode and OpenAI API usage you have left.
+Click to compare providers. Connect everything from a native Mac window — no config files, no terminal.
 
-| Provider | What it shows | How you connect |
+[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](#requirements)
+[![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![Providers](https://img.shields.io/badge/providers-7-9EF58C)](#supported-providers)
+[![Status](https://img.shields.io/badge/status-preview-orange)](#project-status)
+
+[Features](#features) •
+[Providers](#supported-providers) •
+[Install](#installation) •
+[Usage](#usage) •
+[Privacy](#privacy--security) •
+[Development](docs/DEVELOPMENT.md)
+
+<br>
+
+<img src="docs/renders/overview.png" width="560" alt="Kazoo overview panel showing Codex, Claude and OpenAI API usage">
+
+</div>
+
+---
+
+## Features
+
+- **Lives in the notch** — your favorite provider's name sits on one side of the camera and its most important
+  reading on the other, like `31% weekly left` or `$2.80 today`.
+- **Compare at a glance** — click the notch for up to three pinned providers side by side, then drill into any of
+  them for every window, reset time and limit.
+- **Honest numbers** — missing data stays blank, a reported zero shows as zero, dollars never get a fake gauge, and
+  countdowns come straight from provider timestamps.
+- **Model limits stay separate** — a cap on one model never makes your whole account look empty.
+- **Native setup** — search for a provider and connect it with one click: reuse a sign-in already on your Mac,
+  approve a GitHub code, or paste an admin key. No shell commands.
+- **Resilient** — offline or rate-limited? The last good reading stays up with its age while Kazoo backs off and
+  retries.
+- **Stays out of your way** — the panel never steals focus, closes with <kbd>Esc</kbd>, and falls back to the menu bar
+  on displays without a notch.
+- **Accessible** — VoiceOver labels on every reading, full keyboard shortcuts, and Reduce Motion support.
+
+<div align="center">
+<img src="docs/renders/detail-claude.png" width="270" alt="Claude detail">
+<img src="docs/renders/detail-cursor.png" width="270" alt="Cursor detail">
+<img src="docs/renders/detail-openai.png" width="270" alt="OpenAI API detail">
+</div>
+
+## Supported providers
+
+| Provider | What you see | How you connect |
 |---|---|---|
-| Codex | 5-hour and weekly allowance, each with its own reset; works with accounts that report only one window | **Use account on this Mac** (reads `~/.codex`), or **Sign in with Codex CLI** |
-| Claude | 5-hour session and weekly (all models); model-specific weekly limits listed underneath | **Use account on this Mac** (Claude Code sign-in), or **Sign in with Claude Code** |
-| Cursor | Included plan usage, billing cycle end, on-demand spend | **Use browser sign-in** (imports the cursor.com session cookie) |
-| GitHub Copilot | Premium-request quota, or AI credits used plus the billing period | **Sign in with GitHub** (device code in your browser) |
-| Gemini CLI | Pro, Flash and Flash Lite buckets, each with its own reset. The source is labeled Gemini CLI | **Use Gemini CLI sign-in** (reads `~/.gemini`) |
-| OpenCode | Workspace spend over 30 days, prepaid balance, or subscription windows | **Connect workspace** (browser session, optional workspace ID) |
-| OpenAI API | Organization spend today and over the last 7 days, plus a daily chart | **Add admin key** (`sk-admin-…`, stored in Keychain) |
+| **Codex** | 5-hour and weekly allowance, each with its own reset | Use the Codex sign-in on this Mac |
+| **Claude** | 5-hour session, weekly (all models), model-specific weekly limits | Use the Claude Code sign-in on this Mac |
+| **Cursor** | Included plan usage, billing cycle end, on-demand spend | Use your cursor.com browser session |
+| **GitHub Copilot** | Premium-request quota, or AI credits used in the billing period | Sign in with GitHub (device code) |
+| **Gemini CLI** | Pro, Flash and Flash Lite quota buckets | Use the Gemini CLI sign-in on this Mac |
+| **OpenCode** | 30-day spend, prepaid balance, or subscription windows | Use your opencode.ai browser session |
+| **OpenAI API** | Organization spend today and over 7 days, with a daily chart | Add an organization Admin key |
 
-## Build and run
+Codex usage reflects your ChatGPT plan and is kept separate from OpenAI API organization spend.
 
-You need Xcode 26 (Swift 6.2) on macOS 14 or later.
+## Installation
+
+### Requirements
+
+- macOS 14 Sonoma or later
+- A Mac with a notch for the notch view (any Mac works through the menu bar)
+- Xcode 26 to build from source
+
+### Build from source
 
 ```bash
-Scripts/build.sh            # Release build → dist/Kazoo.app (ad-hoc signed)
-```
-
-```bash
+git clone git@github.com:devmithunnath/kazoo.git
+cd kazoo
+Scripts/build.sh
 open dist/Kazoo.app
 ```
 
-You can also open `Kazoo.xcodeproj` in Xcode and run the **Kazoo** scheme. Xcode resolves the
-local `KazooKit` package and the pinned CodexBar revision on its own.
+Prefer Xcode? Open `Kazoo.xcodeproj` and run the **Kazoo** scheme.
 
-- **Try it without accounts:** check `--demo` in the scheme's arguments, or run
-  `open dist/Kazoo.app --args --demo`. Demo mode runs in memory with labeled sample data and never
-  touches your saved accounts. You can also turn it on in the Connections window ("Explore with demo data").
-- **Tests:** run `cd KazooKit && swift test`. There are 36 tests, covering units and timing, the
-  snapshot mapping for all seven providers, the store's refresh and recovery behavior, and routing.
-- **Live probe (developer):** run `cd KazooKit && swift run kazoo-probe claude cli`. It prints the
-  normalized reading the notch would show, and never prints credentials. Copilot and OpenAI read
-  `KAZOO_COPILOT_TOKEN` / `KAZOO_OPENAI_ADMIN_KEY` from the environment.
-- **Visual QA without screen recording:** run `cd KazooKit && swift run kazoo-render /tmp/kazoo-renders`.
-  It renders every panel state to PNG from fixtures.
+> [!TIP]
+> Want to look around before connecting anything? Launch with sample data:
+> `open dist/Kazoo.app --args --demo`
 
-## Using it
+Signed and notarized builds will be published on the [Releases](https://github.com/devmithunnath/kazoo/releases)
+page.
 
-- **Collapsed notch:** your favorite provider's short name sits left of the camera and one reading sits
-  on the right, such as `31% weekly left` or `$2.80 today`. The camera area stays empty. The strip is
-  only as wide as its text.
-- **Click the notch:** with one provider you see its detail. With several you see an overview of up to
-  three pinned providers, then **All N providers**. Press Esc or click outside to dismiss. The panel
-  never activates Kazoo, so your app keeps focus. Shortcuts: `1`–`3` open the pinned providers,
-  `⌘[` goes back, `⌘R` refreshes, `⌘,` opens Settings.
-- **Right-click the notch** to get Refresh, Connections, Settings and Quit.
-- **Displays without a notch:** a menu-bar item shows the same panel in a popover. It also appears when
-  the notched display is not your primary display, or when you turn on **Always show menu bar item**.
-  Placement is checked again when displays change and after wake.
-- **Settings:** choose the favorite, reorder or replace pinned providers, set the display name and
-  refresh interval, and turn on open at login and demo mode. Third-party notices are here too.
+## Usage
 
-### Readings
+1. **Connect a provider.** On first launch, Kazoo opens **Connections**. Pick a provider and follow its one-step
+   action. Kazoo fetches a first reading to confirm it works.
+2. **Glance at the notch.** Your first connected provider becomes the favorite shown in the notch.
+3. **Click for details.** One provider opens its detail view; several open the pinned overview.
 
-- For Codex and Claude, the summary is the **lowest remaining account-wide window**, with its name
-  shown. A limit on one model never makes the whole account look exhausted.
-- A value the provider didn't report shows as `—`. A reported zero shows as `0%`.
-- Dollar amounts never get a gauge. Copilot credits get a gauge only when a denominator is known.
-- The lit squares and the percentage label come from the same rounded number.
-- Countdowns use provider timestamps. At zero, the panel shows *Reset due · confirming…*, refreshes once,
-  and waits for the provider before showing a refilled quota.
-- After a temporary failure (offline or rate limited), the last good reading stays visible with its
-  age, and refreshes back off from 1 to 30 minutes. A disconnect or a switch to another account clears
-  the old account's data right away.
+| Action | Shortcut |
+|---|---|
+| Open a pinned provider | <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> |
+| Go back | <kbd>⌘</kbd> <kbd>[</kbd> |
+| Refresh | <kbd>⌘</kbd> <kbd>R</kbd> |
+| Settings | <kbd>⌘</kbd> <kbd>,</kbd> |
+| Close the panel | <kbd>Esc</kbd> or click outside |
 
-### Credentials
+Right-click the notch for **Refresh**, **Connections**, **Settings** and **Quit**. In Settings you can change the
+favorite, reorder pinned providers, set the refresh interval, and turn on **Open at login**.
 
-- API keys and GitHub device tokens are stored in Keychain under `com.pipboxes.kazoo.credentials`.
-- Sign-ins owned by other tools (`~/.codex`, Claude Code, `~/.gemini`, browser cookies) are read where
-  they already are, and only after you click the provider's connect action. Disconnecting removes only
-  what Kazoo stored.
-- Ordinary preferences are kept in `UserDefaults`. The last good readings, which contain no secrets, are
-  kept in `~/Library/Application Support/Kazoo/readings.json`.
+## Privacy & security
 
-## Project layout
+- **Everything runs on your Mac.** Kazoo talks only to the providers you connect. No analytics, no servers of
+  its own.
+- **Secrets live in your Keychain.** API keys and GitHub tokens are stored there and never written to logs, config files or caches.
+- **You stay in control.** Sign-ins owned by other tools (Codex, Claude Code, Gemini CLI, your browser) are read
+  only after you click connect, and macOS asks before Kazoo can open a Keychain item. Disconnecting removes
+  everything Kazoo stored.
 
-```
-Kazoo.xcodeproj      App target (shared scheme "Kazoo")
-Kazoo/               AppKit shell: notch panels, menu-bar fallback, windows, app lifecycle
-KazooKit/               Swift package: models, the UsageSource interface, CodexBarCore adapter, store, SwiftUI views
-  Sources/KazooKit/Engine/CodexBarUsageSource.swift   the single bridge to CodexBarCore
-  Sources/KazooKit/Engine/SnapshotMapper.swift        UsageSnapshot → UsageReading for all seven providers
-  Sources/KazooKit/Store/UsageStore.swift             refresh, dedupe, backoff, generations, persistence
-  Sources/KazooKit/UI/                                notch panel, Connections, Settings, previews
-Scripts/build.sh        reproducible local build
-Scripts/make_icon.swift regenerates Kazoo/Assets.xcassets/AppIcon.appiconset (swift Scripts/make_icon.swift <dir>)
-Scripts/release.sh      Developer ID signing + notarization + stapling
-```
+## How it works
 
-Every provider sits behind one app-owned protocol, `UsageSource.fetch(_:) -> UsageReading`. The views
-only see `UsageReading`/`Meter`, so a change in one provider never reaches the notch views. The display
-name is configurable in Settings and through the `KAZOO_DISPLAY_NAME` build setting.
+Kazoo is a native Swift, SwiftUI and AppKit app. Provider fetching and parsing come from
+[CodexBar](https://github.com/steipete/CodexBar)'s `CodexBarCore`, pinned to a tested release and wrapped behind a
+single app-owned interface. macOS has no notch API, so Kazoo measures the camera housing from the display's safe
+area and draws borderless, non-activating panels around it.
 
-## Direct distribution (Developer ID + notarization)
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the architecture, tests and developer tools, and
+[docs/RELEASING.md](docs/RELEASING.md) for signing and notarization.
 
-1. Create a **Developer ID Application** certificate (Xcode → Settings → Accounts → Manage
-   Certificates, or developer.apple.com).
-2. Store notarization credentials once:
+## Project status
 
-   ```bash
-   xcrun notarytool store-credentials kazoo-notary --apple-id "<apple-id>" --team-id "<TEAMID>" --password "<app-specific-password>"
-   ```
+Kazoo is an early preview. All seven providers are implemented and covered by tests. Claude has been verified
+against a live account; the others are still being exercised end to end. Bug reports and feedback are very welcome
+in [Issues](https://github.com/devmithunnath/kazoo/issues).
 
-3. Build, sign, notarize and staple:
+## Contributing
 
-   ```bash
-   DEVELOPER_ID="Developer ID Application: PipBoxes (TEAMID)" TEAM_ID=TEAMID NOTARY_PROFILE=kazoo-notary Scripts/release.sh
-   ```
+Contributions are welcome. Before opening a pull request:
 
-   This produces `dist/Kazoo-<version>.zip` with a stapled app. Hardened Runtime is on. The app is
-   not sandboxed, because it has to read CLI sign-ins, run provider CLIs and import browser sessions, the
-   same as CodexBar.
+1. Build with `Scripts/build.sh` and run the tests with `cd KazooKit && swift test`.
+2. Keep provider-specific logic inside `KazooKit/Sources/KazooKit/Engine` so the views stay provider-neutral.
+3. Never commit credentials, and use fixtures rather than live account data in tests.
 
-## License notices
+## Acknowledgements
 
-Kazoo bundles CodexBarCore (MIT), QuickJS (MIT), SweetCookieKit (MIT), swift-crypto, swift-log and
-swift-asn1 (Apache 2.0). The full texts are in `KazooKit/Sources/KazooKit/Resources/ThirdPartyNotices.txt`
-and in Settings → About → Third-party notices. Code adapted from CodexBar's app target and CLI (the login
-runner and the fetch-context assembly) is marked in source and stays under CodexBar's MIT license.
+- [CodexBar](https://github.com/steipete/CodexBar) by Peter Steinberger — the provider engine behind Kazoo.
+- [ccusage](https://github.com/ccusage/ccusage) — inspiration for honest, local-first usage tracking.
 
-## Verification status (2026-11-26)
+## License
 
-| Provider | Status | Detail |
-|---|---|---|
-| Claude | **live-tested** | A real reading through CodexBarCore on this Mac: 5-hour session 92% left, resets in 4h 47m (CLI source). Weekly was not reported and correctly stayed absent. The GUI connect flow has not been clicked through. |
-| Codex | **live-tested (error path)** · fixture-tested reading | A real response, correctly classified as **Sign-in expired**: the local `~/.codex/auth.json` needs `codex login`, and Codex CLI is not on PATH. A successful reading is blocked until you sign in again. |
-| Gemini CLI | **live-tested (not-signed-in path)** · fixture-tested reading | Correctly classified as not signed in; Gemini CLI is not installed here. The Connections window shows the install link and **Check again**. |
-| Cursor | fixture-tested · **blocked** | There is no Cursor session on this Mac. Importing browser cookies brings up macOS Keychain prompts that you have to approve. |
-| GitHub Copilot | fixture-tested · **blocked** | The device flow needs you to approve the code in a browser signed in to GitHub. |
-| OpenCode | fixture-tested · **blocked** | Needs a signed-in opencode.ai browser session. |
-| OpenAI API | fixture-tested · **blocked** | Needs an organization Admin key. |
+Kazoo bundles open-source software including CodexBarCore, QuickJS and SweetCookieKit (MIT) and swift-crypto,
+swift-log and swift-asn1 (Apache 2.0). Full notices are in
+[ThirdPartyNotices.txt](KazooKit/Sources/KazooKit/Resources/ThirdPartyNotices.txt) and in
+**Settings → About → Third-party notices**.
 
-**Verified on this Mac (MacBook Pro, built-in notch 185×32 pt, normal scale):**
-
-- Debug and Release builds succeed.
-- The collapsed strip is centered on the camera housing and flush with the top. The expanded panel is
-  centered and the collapsed strip hides while it is open.
-- First launch with zero accounts opens Connections.
-- The panel did not take focus from the foreground app.
-- Every panel state renders correctly (see `kazoo-render`).
-
-**Still needs hands-on QA:** the screen was locked during this session, and there was no
-screen-recording or accessibility-automation permission.
-
-- Clicking through each connect flow, quit and relaunch
-- An external display, and sleep and wake
-- Keyboard navigation in the panel
-- VoiceOver labels (implemented on every column, row and the collapsed notch)
-- Reduce Motion (animations are skipped when it is on)
-- Running with one, three and seven live providers
-- Notarization, which is blocked because no Developer ID Application certificate is installed
-# kazoo
+<div align="center">
+<sub>Made by <a href="https://github.com/devmithunnath">PipBoxes</a> for people who'd rather not run out of tokens mid-thought.</sub>
+</div>
