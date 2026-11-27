@@ -250,6 +250,7 @@ public enum SnapshotMapper {
 
     static func sourceLabel(provider: ProviderID, raw: String) -> String {
         if provider == .gemini { return "Gemini CLI" }
+        if provider == .claude, raw == "claude" { return "Claude CLI" }
         if provider == .antigravity {
             switch raw.lowercased() {
             case let s where s.contains("cli") || s.contains("agy"): return "Antigravity CLI"

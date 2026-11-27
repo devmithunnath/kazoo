@@ -37,7 +37,8 @@ For each release:
    Scripts/package.sh            # preview build (ad-hoc signed)
    ```
 
-   For a notarized build, run `Scripts/release.sh` first, then zip `dist/Kazoo.app` the same way and update the
+   `Scripts/build.sh` signs with your Developer ID or Apple Development certificate so users' Keychain
+   permissions survive updates (see `docs/DEVELOPMENT.md`). For a notarized build, run `Scripts/release.sh` first, then zip `dist/Kazoo.app` the same way and update the
    checksum in `Casks/kazoo.rb`. Remove the cask's quarantine `postflight` block once builds are notarized.
 3. Create a GitHub release tagged `v<version>` and attach `dist/Kazoo-<version>.zip`.
 4. Commit and push `Casks/kazoo.rb`. Users get the update with `brew upgrade --cask kazoo`.

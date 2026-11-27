@@ -80,7 +80,9 @@ public protocol UsageSource: Sendable {
 /// Maps arbitrary upstream errors to `FetchFailure`. Conservative: only explicit signals count as auth failures.
 public enum FailureClassifier {
     public static let permissionMessage = "macOS needs your permission to read this sign-in from the Keychain. "
-        + "Click Check again and choose Always Allow in the Keychain prompt."
+        + "Try again and choose Always Allow when macOS asks."
+    public static let savedKeyPermissionMessage = "macOS needs your permission before Kazoo can read the key it saved "
+        + "(this happens after an update). Try again and choose Always Allow when macOS asks."
 
     public static func classify(_ error: Error) -> FetchFailure {
         if let failure = error as? FetchFailure { return failure }

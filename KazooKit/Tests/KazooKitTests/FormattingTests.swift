@@ -78,6 +78,22 @@ struct FormattingTests {
         if case .companionNotRunning = closed {} else { Issue.record("expected companionNotRunning") }
         #expect(closed.isTransient)
         #expect(SetupGuide.guide(for: .antigravity).recoveryAction(for: closed.connectionStatus) == "Open Antigravity")
+        // Claude recovers through its own CLI when Kazoo's Keychain grant was revoked by token rotation.
+        #expect(CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .claude, sourceOverride: nil, failure: changed, ownerCLIAvailable: true))
+        #expect(CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .claude, sourceOverride: "auto", failure: .expired("x"), ownerCLIAvailable: true))
+        #expect(!CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .claude, sourceOverride: nil, failure: changed, ownerCLIAvailable: false))
+        #expect(!CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .claude, sourceOverride: "oauth", failure: changed, ownerCLIAvailable: true))
+        #expect(!CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .claude, sourceOverride: nil, failure: .offline, ownerCLIAvailable: true))
+        #expect(!CodexBarUsageSource.shouldRecoverWithOwnerCLI(
+            provider: .codex, sourceOverride: nil, failure: .expired("x"), ownerCLIAvailable: true))
+        #expect(CodexBarUsageSource.rewordedForKazoo(.expired(
+            "Codex auth.json needs refresh. Reauthenticate this account or run `codex login` in the same Codex home."))
+            == .expired("Codex auth.json needs refresh. Sign in to Codex again from Connections."))
         #expect(FetchFailure.offline.isTransient)
         #expect(!FetchFailure.expired("x").isTransient)
     }

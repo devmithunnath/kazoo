@@ -307,9 +307,24 @@ public final class UsageStore: ObservableObject {
         let demo = self.isDemo
         let source = demo ? self.demoSource : self.liveSource
         let account = self.account(for: provider)
+        var secret: String?
+        if !demo {
+            switch self.secrets.lookupSecret(for: provider, allowPrompt: manual) {
+            case let .found(value):
+                secret = value
+            case .missing:
+                secret = nil
+            case .needsPermission:
+                // Never show a Keychain prompt from a background refresh. Keep the last reading and offer
+                // "Try again", which reads the key interactively.
+                self.lastAttempt[provider] = self.clock()
+                self.applyFailure(.needsPermission(FailureClassifier.savedKeyPermissionMessage), provider: provider)
+                return
+            }
+        }
         let request = FetchRequest(
             provider: provider,
-            secret: demo ? nil : self.secrets.secret(for: provider),
+            secret: secret,
             workspaceID: account?.workspaceID,
             sourceOverride: account?.sourceOverride,
             interactive: manual)

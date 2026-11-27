@@ -49,26 +49,85 @@ public struct CodexBarUsageSource: UsageSource {
     }
 
     public func fetch(_ request: FetchRequest) async throws(FetchFailure) -> UsageReading {
-        let provider = request.provider.coreProvider
-        let descriptor = ProviderDescriptorRegistry.descriptor(for: provider)
         let sourceMode = request.sourceOverride.flatMap(ProviderSourceMode.init(rawValue:))
             ?? request.provider.defaultSourceMode
-        guard descriptor.fetchPlan.sourceModes.contains(sourceMode) else {
-            throw .other("\(request.provider.displayName) does not support the “\(sourceMode.rawValue)” source.")
-        }
         if request.provider == .copilot || request.provider == .openai {
             guard let secret = request.secret, !secret.isEmpty else {
                 throw .notSignedIn("No saved credential for \(request.provider.displayName).")
             }
         }
+        let env = Self.environment(for: request, sourceMode: sourceMode)
+        // CodexBarCore only shows Keychain/permission prompts for user-initiated fetches.
+        let interaction: ProviderInteraction = request.interactive ? .userInitiated : .background
+        do {
+            return try await self.fetchOnce(request, sourceMode: sourceMode, env: env, interaction: interaction)
+        } catch {
+            guard Self.shouldRecoverWithOwnerCLI(
+                provider: request.provider,
+                sourceOverride: request.sourceOverride,
+                failure: error,
+                ownerCLIAvailable: Self.ownerCLIAvailable(for: request.provider, env: env))
+            else { throw error }
+            // Claude Code rotates its token and rewrites its Keychain item every few hours, which revokes
+            // Kazoo's access grant. Instead of asking the user to re-allow it, read usage through the
+            // `claude` CLI, which owns that Keychain item and reads it without a prompt from Kazoo.
+            do {
+                return try await self.fetchOnce(
+                    request, sourceMode: .cli, env: env,
+                    // CodexBarCore only launches the owner CLI outside its own "established" session policy
+                    // for user-initiated work; Kazoo deliberately opts in for this recovery path.
+                    interaction: .userInitiated)
+            } catch let cliFailure {
+                if case .notSignedIn = cliFailure { throw cliFailure }
+                throw error
+            }
+        }
+    }
 
-        let baseEnv = Self.baseEnvironment()
+    /// Whether a failed fetch should be retried through the provider's own CLI (no Kazoo Keychain access).
+    static func shouldRecoverWithOwnerCLI(
+        provider: ProviderID,
+        sourceOverride: String?,
+        failure: FetchFailure,
+        ownerCLIAvailable: Bool) -> Bool
+    {
+        guard provider == .claude, ownerCLIAvailable else { return false }
+        // Respect an explicit source the user picked under Advanced (other than Automatic).
+        if let sourceOverride, sourceOverride != "auto" { return false }
+        switch failure {
+        case .needsPermission, .expired, .notSignedIn: return true
+        case .offline, .rateLimited, .usageUnavailable, .companionNotRunning, .other: return false
+        }
+    }
+
+    static func ownerCLIAvailable(for provider: ProviderID, env: [String: String]) -> Bool {
+        switch provider {
+        case .claude: BinaryLocator.resolveClaudeBinary(env: env) != nil
+        default: false
+        }
+    }
+
+    private static func environment(for request: FetchRequest, sourceMode: ProviderSourceMode) -> [String: String] {
         let config = Self.providerConfig(for: request, sourceMode: sourceMode)
-        let env = ProviderEnvironmentResolver.resolve(
-            base: baseEnv,
-            provider: provider,
+        return ProviderEnvironmentResolver.resolve(
+            base: Self.baseEnvironment(),
+            provider: request.provider.coreProvider,
             config: config,
             selectedAccount: nil)
+    }
+
+    private func fetchOnce(
+        _ request: FetchRequest,
+        sourceMode: ProviderSourceMode,
+        env: [String: String],
+        interaction: ProviderInteraction) async throws(FetchFailure) -> UsageReading
+    {
+        let provider = request.provider.coreProvider
+        let descriptor = ProviderDescriptorRegistry.descriptor(for: provider)
+        guard descriptor.fetchPlan.sourceModes.contains(sourceMode) else {
+            throw .other("\(request.provider.displayName) does not support the “\(sourceMode.rawValue)” source.")
+        }
+        let config = Self.providerConfig(for: request, sourceMode: sourceMode)
         let settings = Self.settingsSnapshot(for: request.provider, config: config, env: env)
         let browserDetection = BrowserDetection()
         let context = ProviderFetchContext(
@@ -85,10 +144,14 @@ public struct CodexBarUsageSource: UsageSource {
             claudeFetcher: ClaudeUsageFetcher(browserDetection: browserDetection, environment: env),
             browserDetection: browserDetection)
 
-        // CodexBarCore only shows Keychain/permission prompts for user-initiated fetches.
-        let interaction: ProviderInteraction = request.interactive ? .userInitiated : .background
         let outcome = await ProviderInteractionContext.$current.withValue(interaction) {
             await descriptor.fetchOutcome(context: context)
+        }
+        if env["KAZOO_DEBUG_ATTEMPTS"] == "1" {
+            // Developer aid (kazoo-probe): which strategies ran. Error text only, never credentials.
+            for attempt in outcome.attempts {
+                print("attempt \(attempt.strategyID) available=\(attempt.wasAvailable) error=\(attempt.errorDescription ?? "-")")
+            }
         }
         switch outcome.result {
         case let .success(result):
@@ -112,6 +175,8 @@ public struct CodexBarUsageSource: UsageSource {
                  "Click Check again, or choose another data source under Advanced."),
                 ("Click Refresh to retry access, or switch Claude Usage source to CLI/Web.",
                  "Click Check again, or choose another data source under Advanced."),
+                (" Reauthenticate this account or run `codex login` in the same Codex home.",
+                 " Sign in to Codex again from Connections."),
                 ("Click Refresh", "Click Check again"),
                 ("CodexBar", "Kazoo"),
             ]

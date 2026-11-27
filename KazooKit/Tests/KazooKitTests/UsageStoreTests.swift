@@ -171,6 +171,31 @@ struct UsageStoreTests {
         #expect(store.reading(for: .claude)?.meters.first?.remainingPercent == 60) // last reading kept
     }
 
+    @Test func backgroundRefreshNeverPromptsForSavedKey() async {
+        let source = ScriptedSource()
+        let secrets = MemorySecretStore()
+        let store = makeStore(source: source, secrets: secrets)
+        await source.enqueue(.openai, .success(UsageReading(provider: .openai, meters: [
+            Meter(id: "today", title: "Today", shortTitle: "today", value: .money(amount: 1, currencyCode: "USD")),
+        ], sourceLabel: "api")))
+        _ = await store.connect(.openai, secret: "sk-admin-test")
+        // After an app update macOS would have to ask before the key can be read.
+        secrets.promptRequired = [.openai]
+        store.refresh(.openai, manual: false)
+        await store.waitForRefreshes()
+        #expect(await source.callCount(.openai) == 1) // no fetch without the key, and no prompt
+        #expect(store.status(for: .openai) == .failed(FailureClassifier.savedKeyPermissionMessage))
+        #expect(store.reading(for: .openai) != nil) // last reading kept
+        // "Try again" is a user action: the key is read interactively and the refresh proceeds.
+        await source.enqueue(.openai, .success(UsageReading(provider: .openai, meters: [
+            Meter(id: "today", title: "Today", shortTitle: "today", value: .money(amount: 2, currencyCode: "USD")),
+        ], sourceLabel: "api")))
+        store.refresh(.openai, manual: true)
+        await store.waitForRefreshes()
+        #expect(store.status(for: .openai) == .connected)
+        #expect(store.reading(for: .openai)?.meters.first?.value == .money(amount: 2, currencyCode: "USD"))
+    }
+
     @Test func signedInButNoUsageIsAConnectedState() async {
         let source = ScriptedSource()
         let store = makeStore(source: source)

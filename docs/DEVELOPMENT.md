@@ -78,6 +78,17 @@ the same SwiftUI panel.
 generation counter that discards results from disconnected or switched accounts. Only user-initiated fetches
 may show macOS Keychain prompts.
 
+**Staying signed in without prompts.** Background refreshes never show a Keychain prompt:
+
+- *Claude:* Claude Code rotates its token every few hours and rewrites its Keychain item, which revokes the
+  access the user granted Kazoo. When the direct read fails, Kazoo reads usage through the `claude` CLI, which
+  owns that item and needs no prompt from Kazoo (`CodexBarUsageSource.shouldRecoverWithOwnerCLI`).
+- *Kazoo's own keys (Copilot, OpenAI):* background reads use a no-UI Keychain query. If macOS would need to ask,
+  the provider shows "Try again" and keeps its last reading; the prompt only appears after that click.
+- *Signing:* macOS ties "Always Allow" to the app's signature. `Scripts/build.sh` re-signs with a stable identity
+  (Developer ID, else Apple Development; override with `KAZOO_SIGN_IDENTITY`) so grants survive updates.
+  Ad-hoc builds (`KAZOO_SIGN_IDENTITY=-`, or running from Xcode) are asked again after every build.
+
 ## Verification status
 
 | Provider | Status |
