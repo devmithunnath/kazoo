@@ -109,6 +109,13 @@ struct FormattingTests {
             "Live Antigravity usage is unavailable; showing offline data. the usage request failed (HTTP 500)")
             == .companionNotRunning("Couldn’t read live Antigravity usage (the usage request failed (HTTP 500)). "
                 + "Open the Antigravity app, make sure you’re signed in, then check again."))
+        // Antigravity 2.x hides its CSRF token: explain and offer the agy CLI route.
+        let token = CodexBarUsageSource.antigravityLiveFailure(diagnostic:
+            "Live Antigravity usage is unavailable; showing offline data. Antigravity CSRF token not found. Restart Antigravity and retry.")
+        #expect(token == .companionNotRunning(CodexBarUsageSource.antigravityTokenMessage))
+        #expect(FailureClassifier.classify(message: "Antigravity CSRF token not found. Restart Antigravity and retry.")
+            == .companionNotRunning(CodexBarUsageSource.antigravityTokenMessage))
+        #expect(SetupGuide.guide(for: .antigravity).recoveryAction(for: token.connectionStatus) == "Set Up Antigravity CLI")
         #expect(FetchFailure.offline.isTransient)
         #expect(!FetchFailure.expired("x").isTransient)
     }

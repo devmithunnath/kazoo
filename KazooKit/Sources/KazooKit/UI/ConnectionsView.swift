@@ -366,7 +366,28 @@ struct ConnectDetailView: View {
                 Label(message, systemImage: "person.crop.circle.badge.exclamationmark")
                     .fixedSize(horizontal: false, vertical: true)
                 if let cli = self.model.companion {
-                    if let appName = cli.appName, cli.appURL != nil {
+                    if message.contains("Antigravity CLI") {
+                        if self.model.companionPath != nil {
+                            Text("Antigravity CLI is installed. Sign in once, then check again.")
+                                .font(.callout).foregroundStyle(.secondary)
+                            HStack {
+                                Button("Open Antigravity CLI to sign in") { self.model.signInWithCompanion() }
+                                Button("Check again") { self.model.verify(secret: nil) }
+                            }
+                        } else {
+                            Text("Install it with Homebrew, then sign in once:")
+                                .font(.callout).foregroundStyle(.secondary)
+                            Text(CodexBarUsageSource.antigravityCLIInstallCommand)
+                                .font(.system(.callout, design: .monospaced)).textSelection(.enabled)
+                            HStack {
+                                Button("Copy Install Command") { self.model.copyAntigravityInstallCommand() }
+                                Button("Check again") {
+                                    self.model.detectCompanion()
+                                    self.model.verify(secret: nil)
+                                }
+                            }
+                        }
+                    } else if let appName = cli.appName, cli.appURL != nil {
                         HStack {
                             Button("Open \(appName)") { self.model.openCompanionApp() }
                             Button("Check again") { self.model.verify(secret: nil) }

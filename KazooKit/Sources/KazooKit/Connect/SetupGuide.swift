@@ -155,6 +155,8 @@ public struct SetupGuide: Sendable, Equatable {
             case .browserSession: "Check again"
             case let .localAccount(cli): cli.browserLoginArguments == nil ? "Check again" : "Sign in again"
             }
+        case let .failed(message) where self.provider == .antigravity && message.contains("Antigravity CLI"):
+            "Set Up Antigravity CLI"
         case .failed where self.provider == .antigravity: "Open Antigravity"
         case .offline, .failed: "Try again"
         case .usageUnavailable: "Check again"

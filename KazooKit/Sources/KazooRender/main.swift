@@ -43,6 +43,12 @@ func main() {
     let stale = PreviewSupport.store(providers: [.codex, .claude], statuses: [.codex: .offline, .claude: .expired])
     render(PreviewSupport.panel(store: stale, route: .detail(.codex), back: .overview), to: out.appendingPathComponent("stale-codex.png"))
     render(PreviewSupport.panel(store: stale, route: .overview), to: out.appendingPathComponent("overview-stale.png"))
+    let agFailed = PreviewSupport.store(
+        providers: [.antigravity, .codex],
+        statuses: [.antigravity: .failed(CodexBarUsageSource.antigravityTokenMessage)],
+        withoutReadings: [.antigravity])
+    render(PreviewSupport.panel(store: agFailed, route: .detail(.antigravity), back: .overview),
+           to: out.appendingPathComponent("antigravity-failed.png"))
     let empty = PreviewSupport.store(providers: [])
     render(PreviewSupport.panel(store: empty, route: .empty), to: out.appendingPathComponent("empty.png"))
 }

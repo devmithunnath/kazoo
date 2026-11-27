@@ -31,14 +31,11 @@ struct ProviderDetailView: View {
                     .padding(.top, 14)
             }
 
-            Group {
-                if let reading, !reading.meters.isEmpty {
-                    self.meters(reading)
-                } else {
-                    StatusPlaceholder(status: status).padding(.vertical, 18)
-                }
+            if let reading, !reading.meters.isEmpty {
+                self.meters(reading).padding(.top, 22)
+            } else if !status.isProblem {
+                StatusPlaceholder(status: status).padding(.vertical, 18).padding(.top, 22)
             }
-            .padding(.top, 22)
         }
     }
 
@@ -113,15 +110,19 @@ struct StatusBanner: View {
                 .foregroundStyle(KazooTheme.warning)
             VStack(alignment: .leading, spacing: 2) {
                 Text(self.title).font(.system(size: 14, weight: .semibold))
+                    .fixedSize(horizontal: false, vertical: true)
                 if let detail = self.status.detail {
                     Text(detail).font(.system(size: 12)).foregroundStyle(KazooTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: 340, alignment: .leading)
                 }
             }
             Spacer(minLength: 12)
             if let action = SetupGuide.guide(for: self.provider).recoveryAction(for: self.status) {
                 Button(action) {
                     switch self.status {
+                    case let .failed(message) where self.provider == .antigravity && message.contains("Antigravity CLI"):
+                        self.actions.openConnections(self.provider)
                     case .failed where self.provider == .antigravity:
                         self.openCompanionAppThenRefresh()
                     case .offline, .failed: self.store.refresh(self.provider, manual: true)
@@ -133,7 +134,7 @@ struct StatusBanner: View {
             }
         }
         .padding(12)
-        .frame(maxWidth: 520, alignment: .leading)
+        .frame(width: 520, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.07)))
     }
 

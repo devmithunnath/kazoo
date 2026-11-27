@@ -7,7 +7,8 @@ public enum PreviewSupport {
         providers: [ProviderID],
         favorite: ProviderID? = nil,
         pinned: [ProviderID]? = nil,
-        statuses: [ProviderID: ConnectionStatus] = [:]) -> UsageStore
+        statuses: [ProviderID: ConnectionStatus] = [:],
+        withoutReadings: Set<ProviderID> = []) -> UsageStore
     {
         var prefs = AppPreferences()
         prefs.accounts = providers.map { ConnectedAccount(provider: $0) }
@@ -20,6 +21,7 @@ public enum PreviewSupport {
             .antigravity: "Antigravity app", .opencode: "web", .openai: "api",
         ]
         for key in readings.keys { readings[key]?.isDemo = false; readings[key]?.sourceLabel = sources[key] ?? "api" }
+        for key in withoutReadings { readings[key] = nil }
         cache.save(readings)
         let store = UsageStore(
             liveSource: DemoUsageSource(),
