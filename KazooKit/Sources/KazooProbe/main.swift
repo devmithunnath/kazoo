@@ -4,6 +4,22 @@ import KazooKit
 // Usage: swift run kazoo-probe <provider> [source]
 // Prints the normalized reading that the notch would display. Never prints credentials.
 let args = CommandLine.arguments.dropFirst()
+if args.first == "brew-script", args.count == 5 {
+    // Usage: kazoo-probe brew-script <brew> <app> <pid> <log> — prints the exact helper script Kazoo runs.
+    let a = Array(args)
+    print(BrewUpdater.script(brewPath: a[1], appPath: a[2], pid: Int32(a[3]) ?? 0, logPath: a[4]))
+    exit(0)
+}
+if args.first == "update" {
+    // Usage: kazoo-probe update <current-version>
+    let current = args.dropFirst().first ?? "0.0.0"
+    let controller = await UpdateController(currentVersion: current, installMethod: .detect(),
+                                            fetcher: GitHubReleaseFetcher(appVersion: current),
+                                            defaults: UserDefaults(suiteName: "kazoo.probe") ?? .standard)
+    await controller.check()
+    print("current \(current) → \(await controller.status)")
+    exit(0)
+}
 guard let raw = args.first, let provider = ProviderID(rawValue: raw) else {
     print("usage: kazoo-probe <\(ProviderID.allCases.map(\.rawValue).joined(separator: "|"))> [source]")
     exit(2)

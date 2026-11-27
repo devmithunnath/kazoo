@@ -41,6 +41,10 @@ For each release:
    permissions survive updates (see `docs/DEVELOPMENT.md`). For a notarized build, run `Scripts/release.sh` first, then zip `dist/Kazoo.app` the same way and update the
    checksum in `Casks/kazoo.rb`. Remove the cask's quarantine `postflight` block once builds are notarized.
 3. Create a GitHub release tagged `v<version>` and attach `dist/Kazoo-<version>.zip`.
-4. Commit and push `Casks/kazoo.rb`. Users get the update with `brew upgrade --cask kazoo`.
+4. Commit and push `Casks/kazoo.rb`. Users get the update from **Settings → Updates** (which runs the Homebrew
+   upgrade for them) or with `brew upgrade --cask kazoo`.
+
+Kazoo's in-app update check reads `releases/latest` from the GitHub API, so the tag must be a version like `v0.1.2`
+and the release must not be marked as a draft or pre-release. Attach the zip before pushing the cask.
 
 The cask URL points at the release asset, so push the cask only after the release asset is uploaded.

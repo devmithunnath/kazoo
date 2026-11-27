@@ -133,7 +133,10 @@ func renderScreenshots(to out: URL) {
     captureWindow(ConnectionsView(store: connections, selection: .constant(.openai), solidSidebar: true),
                   size: CGSize(width: 900, height: 620), title: "Connections — Kazoo",
                   to: out.appendingPathComponent("connections-openai.png"))
-    captureWindow(SettingsView(store: connections, openConnections: {}),
-                  size: CGSize(width: 540, height: 900), title: "Kazoo Settings",
+    let updates = UpdateController(currentVersion: "0.1.2", buildNumber: "3",
+                                   installMethod: .homebrew(brewPath: "/opt/homebrew/bin/brew"),
+                                   fetcher: nil, defaults: UserDefaults(suiteName: "kazoo.render") ?? .standard)
+    captureWindow(SettingsView(store: connections, updates: updates, openConnections: {}),
+                  size: CGSize(width: 540, height: 1060), title: "Kazoo Settings",
                   to: out.appendingPathComponent("settings.png"))
 }

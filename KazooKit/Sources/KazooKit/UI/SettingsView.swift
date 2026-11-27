@@ -4,13 +4,15 @@ import SwiftUI
 /// Native Settings: favorite, pinned order, display, refresh, demo, about.
 public struct SettingsView: View {
     @ObservedObject var store: UsageStore
+    let updates: UpdateController?
     let openConnections: () -> Void
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var launchError: String?
     @State private var showNotices = false
 
-    public init(store: UsageStore, openConnections: @escaping () -> Void) {
+    public init(store: UsageStore, updates: UpdateController? = nil, openConnections: @escaping () -> Void) {
         self.store = store
+        self.updates = updates
         self.openConnections = openConnections
     }
 
@@ -87,6 +89,10 @@ public struct SettingsView: View {
                 }
             }
 
+            if let updates {
+                UpdatesSection(updates: updates)
+            }
+
             Section("Accounts") {
                 Button("Open Connections…", action: self.openConnections)
                 Toggle("Demo mode (sample data)", isOn: Binding(
@@ -97,7 +103,9 @@ public struct SettingsView: View {
             }
 
             Section("About") {
-                LabeledContent("Version", value: Self.version)
+                if self.updates == nil {
+                    LabeledContent("Version", value: Self.version)
+                }
                 LabeledContent("Provider engine", value: "CodexBarCore v0.85.0 (5dd48ca)")
                 Button("Third-party notices…") { self.showNotices = true }
             }
@@ -156,5 +164,113 @@ struct NoticesView: View {
         guard let url = Bundle.module.url(forResource: "ThirdPartyNotices", withExtension: "txt"),
               let text = try? String(contentsOf: url, encoding: .utf8) else { return "Notices unavailable." }
         return text
+    }
+}
+
+/// Settings → Updates: version, how Kazoo was installed, and the one action that fits the current state.
+struct UpdatesSection: View {
+    @ObservedObject var updates: UpdateController
+
+    var body: some View {
+        Section("Updates") {
+            LabeledContent("Version", value: "\(self.updates.currentVersion) (\(self.updates.buildNumber))")
+            LabeledContent("Installed with", value: self.updates.installMethod.label)
+            self.statusRow
+            Toggle("Check for updates automatically", isOn: self.$updates.checksAutomatically)
+            Text(self.footnote).font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder private var statusRow: some View {
+        switch self.updates.status {
+        case .idle:
+            HStack {
+                Text(self.lastCheckedText).foregroundStyle(.secondary)
+                Spacer()
+                Button("Check for Updates") { self.updates.checkNow() }
+            }
+        case .checking:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Checking for updates…")
+                Spacer()
+            }
+        case .upToDate:
+            HStack {
+                Label("Kazoo is up to date", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                Spacer()
+                Button("Check Again") { self.updates.checkNow() }
+            }
+        case let .available(release):
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Version \(release.version) is available", systemImage: "arrow.down.circle.fill")
+                    .foregroundStyle(.blue)
+                    .font(.headline)
+                if let notes = release.notes {
+                    Text(notes).font(.callout).foregroundStyle(.secondary).lineLimit(4)
+                }
+                HStack {
+                    Button("Release Notes") { self.updates.openReleaseNotes() }
+                    Spacer()
+                    Button(self.installTitle) { self.updates.install() }
+                        .buttonStyle(.borderedProminent)
+                }
+            }
+        case .installing:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Kazoo will quit, update with Homebrew, and reopen.")
+            }
+        case let .updated(version):
+            HStack {
+                Label("Updated to \(version)", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
+                Spacer()
+                Button("Check Again") { self.updates.checkNow() }
+            }
+        case let .failed(message):
+            HStack {
+                Label(message, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
+                Button("Try Again") { self.updates.checkNow() }
+            }
+        case let .updateFailed(message):
+            VStack(alignment: .leading, spacing: 8) {
+                Label(message, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                Text("You can run the update yourself in Terminal:").font(.caption).foregroundStyle(.secondary)
+                Text(BrewUpdater.manualCommand).font(.system(.caption, design: .monospaced)).textSelection(.enabled)
+                HStack {
+                    Button("Copy Command") { self.updates.copyManualCommand() }
+                    Button("Show Log") { self.updates.openUpdateLog() }
+                    Spacer()
+                    Button("Check Again") { self.updates.checkNow() }
+                }
+            }
+        }
+    }
+
+    private var installTitle: String {
+        switch self.updates.installMethod {
+        case .homebrew: "Update with Homebrew"
+        case .manual, .development: "Download"
+        }
+    }
+
+    private var lastCheckedText: String {
+        guard let date = self.updates.lastChecked else { return "Not checked yet" }
+        return "Last checked \(ResetFormatter.age(of: date))"
+    }
+
+    private var footnote: String {
+        switch self.updates.installMethod {
+        case .homebrew:
+            "Installed with Homebrew, so updates run “brew upgrade --cask kazoo” for you — the same as updating "
+                + "from Terminal. Kazoo quits during the update and reopens when it’s done."
+        case .manual:
+            "Downloads come from the Kazoo releases page on GitHub. Install with Homebrew to get one-click updates."
+        case .development:
+            "This is a development build. Update checks link to the latest release on GitHub."
+        }
     }
 }

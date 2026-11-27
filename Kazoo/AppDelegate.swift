@@ -13,6 +13,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var store: UsageStore!
+    private let updates = UpdateController()
+    private var updateTimer: Timer?
 
     private static func argumentValue(_ name: String) -> String? {
         let args = ProcessInfo.processInfo.arguments
@@ -52,7 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 cache: FileReadingCache())
         }
 
-        self.windows = WindowCoordinator(store: self.store)
+        self.windows = WindowCoordinator(store: self.store, updates: self.updates)
         let actions = PanelActions(
             openConnections: { [weak self] provider in
                 self?.dismissPanels()
@@ -90,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         self.store.startAutoRefresh()
+        self.startUpdateChecks()
         if arguments.contains("--open-panel") {
             // QA: open the expanded panel at launch.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.notch.expand() }
@@ -119,6 +122,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refresh.target = self
         menu.addItem(refresh)
         menu.addItem(.separator())
+        if let release = self.updates.availableRelease {
+            let update = NSMenuItem(title: "Update to \(release.version)…", action: #selector(self.menuCheckForUpdates),
+                                    keyEquivalent: "")
+            update.target = self
+            menu.addItem(update)
+        } else {
+            let check = NSMenuItem(title: "Check for Updates…", action: #selector(self.menuCheckForUpdates),
+                                   keyEquivalent: "")
+            check.target = self
+            menu.addItem(check)
+        }
         let connections = NSMenuItem(title: "Connections…", action: #selector(self.menuConnections), keyEquivalent: "")
         connections.target = self
         menu.addItem(connections)
@@ -135,6 +149,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func menuConnections() { self.windows.showConnections() }
     @objc private func menuSettings() { self.windows.showSettings() }
 
+    @objc private func menuCheckForUpdates() {
+        self.dismissPanels()
+        self.windows.showSettings()
+        if self.updates.availableRelease == nil { self.updates.checkNow() }
+    }
+
+    /// Automatic update checks: shortly after launch, then hourly ticks that only check once a day.
+    private func startUpdateChecks() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) { [weak self] in self?.updates.checkIfDue() }
+        let timer = Timer(timeInterval: 3600, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.updates.checkIfDue() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        self.updateTimer = timer
+    }
+
     /// Minimal main menu so standard editing shortcuts (⌘V into the key field, ⌘W, ⌘Q) work in windows.
     private func installMainMenu() {
         let main = NSMenu()
@@ -143,6 +173,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settings = NSMenuItem(title: "Settings…", action: #selector(self.menuSettings), keyEquivalent: ",")
         settings.target = self
         appMenu.addItem(settings)
+        let checkUpdates = NSMenuItem(title: "Check for Updates…", action: #selector(self.menuCheckForUpdates),
+                                      keyEquivalent: "")
+        checkUpdates.target = self
+        appMenu.addItem(checkUpdates)
         appMenu.addItem(.separator())
         appMenu.addItem(NSMenuItem(title: "Hide", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
         appMenu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))

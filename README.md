@@ -159,6 +159,9 @@ The first command adds Kazoo's tap (this repository) to Homebrew; you only need 
 
 **Update**
 
+Open **Settings → Updates** and click **Update with Homebrew** when a new version is available. Kazoo quits, runs the
+Homebrew upgrade for you, and reopens. Or update from Terminal:
+
 ```bash
 brew update && brew upgrade --cask kazoo
 ```
@@ -215,13 +218,22 @@ The first build downloads the Swift package dependencies and takes a few minutes
 | Settings | <kbd>⌘</kbd> <kbd>,</kbd> |
 | Close the panel | <kbd>Esc</kbd> or click outside |
 
-Right-click the notch for **Refresh**, **Connections**, **Settings** and **Quit**. In Settings you can change the
-favorite, reorder pinned providers, set the refresh interval, and turn on **Open at login**.
+Right-click the notch for **Refresh**, **Check for Updates…**, **Connections**, **Settings** and **Quit**. In
+Settings you can change the favorite, reorder pinned providers, set the refresh interval, and turn on
+**Open at login**.
+
+### Updates
+
+Kazoo checks GitHub for a new release once a day (turn this off in **Settings → Updates**). When one is available:
+
+- **Installed with Homebrew:** **Update with Homebrew** runs `brew upgrade --cask kazoo` for you, so Homebrew stays
+  in sync and `brew upgrade` keeps working too. Kazoo quits during the update and reopens when it's done.
+- **Downloaded manually:** **Download** opens the new release's zip.
 
 ## Privacy & security
 
-- **Everything runs on your Mac.** Kazoo talks only to the providers you connect. No analytics, no servers of
-  its own.
+- **Everything runs on your Mac.** Kazoo talks only to the providers you connect, plus GitHub's public API once a
+  day to check for updates (you can turn that off). No analytics, no servers of its own.
 - **Secrets live in your Keychain.** API keys and GitHub tokens are stored there and never written to logs, config files or caches.
 - **You stay in control.** Sign-ins owned by other tools (Codex, Claude Code, Gemini CLI, your browser) are read
   only after you click connect, and macOS asks before Kazoo can open a Keychain item. Disconnecting removes

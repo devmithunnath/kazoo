@@ -24,8 +24,11 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
     private var connectionsWindow: NSWindow?
     private var settingsWindow: NSWindow?
 
-    init(store: UsageStore) {
+    private let updates: UpdateController
+
+    init(store: UsageStore, updates: UpdateController) {
         self.store = store
+        self.updates = updates
     }
 
     func showConnections(provider: ProviderID? = nil) {
@@ -46,7 +49,7 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
 
     func showSettings() {
         if self.settingsWindow == nil {
-            let controller = NSHostingController(rootView: SettingsView(store: self.store) { [weak self] in
+            let controller = NSHostingController(rootView: SettingsView(store: self.store, updates: self.updates) { [weak self] in
                 self?.showConnections()
             })
             let window = NSWindow(contentViewController: controller)
