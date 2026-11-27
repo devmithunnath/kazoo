@@ -110,6 +110,9 @@ public enum FailureClassifier {
         {
             return .needsPermission(Self.permissionMessage)
         }
+        if m.contains("csrf token not found") {
+            return .companionNotRunning(CodexBarUsageSource.antigravityTokenMessage)
+        }
         if m.contains("language server not detected") || m.contains("launch antigravity") {
             return .companionNotRunning("Antigravity isn’t running. Open the Antigravity app (signed in with Google), "
                 + "then check again.")

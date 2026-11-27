@@ -122,5 +122,6 @@ struct StatusPlaceholder: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .frame(maxWidth: 460, alignment: .leading)
     }
 }

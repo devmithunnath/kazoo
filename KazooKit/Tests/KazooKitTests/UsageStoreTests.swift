@@ -256,6 +256,24 @@ struct UsageStoreTests {
         #expect(store.favoriteProvider == .cursor)
     }
 
+    @Test func staleOfflineHistoryReadingIsDroppedAndEmptyReadingIsNotStale() async {
+        var prefs = AppPreferences()
+        prefs.accounts = [ConnectedAccount(provider: .antigravity)]
+        let cache = MemoryReadingCache()
+        cache.save([.antigravity: UsageReading(provider: .antigravity, meters: [],
+                                               identity: AccountIdentity(plan: "offline"), sourceLabel: "Offline history")])
+        let store = makeStore(source: ScriptedSource(), prefs: prefs, cache: cache)
+        #expect(store.reading(for: .antigravity) == nil)
+
+        let source = ScriptedSource()
+        await source.enqueue(.claude, .failure(.usageUnavailable("none")), .failure(.offline))
+        let empty = makeStore(source: source)
+        _ = await empty.connect(.claude)
+        empty.refresh(.claude, manual: true)
+        await empty.waitForRefreshes()
+        #expect(!empty.isStale(.claude)) // nothing to show, so no "showing reading from…" banner
+    }
+
     @Test func relaunchRestoresAccountsAndCachedReadings() async {
         let source = ScriptedSource()
         let prefsStore = MemoryPreferences()

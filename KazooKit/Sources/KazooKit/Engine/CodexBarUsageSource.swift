@@ -84,12 +84,20 @@ public struct CodexBarUsageSource: UsageSource {
         }
     }
 
+    public static let antigravityCLIInstallCommand = "brew install --cask antigravity-cli"
+    public static let antigravityTokenMessage = "Kazoo can’t read the Antigravity app’s usage: Antigravity 2.x no longer "
+        + "shares the access token Kazoo needs. Install the Antigravity CLI (agy) and run it once to sign in — Kazoo "
+        + "then reads your usage through it."
+
     /// Maps CodexBarCore's reason for Antigravity's offline fallback to a failure with one clear fix.
     static func antigravityLiveFailure(diagnostic: String?) -> FetchFailure {
         let reason = (diagnostic ?? "")
             .replacingOccurrences(of: "Live Antigravity usage is unavailable; showing offline data.", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let r = reason.lowercased()
+        if r.contains("csrf") {
+            return .companionNotRunning(Self.antigravityTokenMessage)
+        }
         if r.contains("not detected") || r.contains("launch antigravity") || r.contains("not running") || r.isEmpty {
             return .companionNotRunning("Antigravity isn’t running. Open the Antigravity app (signed in with "
                 + "Google), then check again.")

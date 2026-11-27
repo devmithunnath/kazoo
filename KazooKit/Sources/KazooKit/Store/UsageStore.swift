@@ -49,10 +49,16 @@ public final class UsageStore: ObservableObject {
         let prefs = preferences.load()
         self.preferences = prefs
         let connected = Set(prefs.accounts.map(\.provider))
-        self.liveReadings = cache.load().filter { connected.contains($0.key) }
+        self.liveReadings = cache.load().filter { connected.contains($0.key) && !Self.isOfflineHistoryOnly($0.value) }
         self.now = clock()
         for account in prefs.accounts { self.statuses[account.provider] = .connected }
         if prefs.demoMode { self.demoReadings = Fixtures.allReadings(now: self.now) }
+    }
+
+    /// Antigravity's offline fallback (conversation counts, no quota) saved by builds before 0.1.4.
+    nonisolated static func isOfflineHistoryOnly(_ reading: UsageReading) -> Bool {
+        reading.provider == .antigravity
+            && (reading.sourceLabel == "Offline history" || reading.identity?.plan?.lowercased() == "offline")
     }
 
     // MARK: - Derived state
@@ -99,7 +105,7 @@ public final class UsageStore: ObservableObject {
 
     public func isStale(_ provider: ProviderID) -> Bool {
         switch self.status(for: provider) {
-        case .offline, .expired, .failed: self.reading(for: provider) != nil
+        case .offline, .expired, .failed: !(self.reading(for: provider)?.meters.isEmpty ?? true)
         default: false
         }
     }

@@ -244,7 +244,7 @@ public enum SnapshotMapper {
         let identity = AccountIdentity(
             email: snapshot.accountEmail?.nilIfBlank,
             organization: snapshot.accountOrganization?.nilIfBlank,
-            plan: snapshot.loginMethod?.nilIfBlank)
+            plan: snapshot.loginMethod?.nilIfBlank.flatMap { $0.lowercased() == "offline" ? nil : $0 })
         return identity.summary == nil ? nil : identity
     }
 

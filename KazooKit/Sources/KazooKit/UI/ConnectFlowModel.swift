@@ -185,6 +185,11 @@ public final class ConnectFlowModel: ObservableObject {
         self.phase = .idle
     }
 
+    public func copyAntigravityInstallCommand() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(CodexBarUsageSource.antigravityCLIInstallCommand, forType: .string)
+    }
+
     public func copyDeviceCode() {
         guard case let .deviceCode(code) = self.phase else { return }
         NSPasteboard.general.clearContents()
