@@ -13,7 +13,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var store: UsageStore!
-    private let updates = UpdateController()
+    /// `--pretend-version 0.1.0` makes the update check behave as if an older version were installed (QA only).
+    private let updates: UpdateController = {
+        let args = ProcessInfo.processInfo.arguments
+        if let index = args.firstIndex(of: "--pretend-version"), args.indices.contains(index + 1) {
+            return UpdateController(currentVersion: args[index + 1])
+        }
+        return UpdateController()
+    }()
     private var updateTimer: Timer?
 
     private static func argumentValue(_ name: String) -> String? {
@@ -93,7 +100,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         self.store.startAutoRefresh()
         self.startUpdateChecks()
-        if arguments.contains("--open-panel") {
+        if arguments.contains("--open-settings") {
+            // QA: open Settings at launch.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.windows.showSettings() }
+        } else if arguments.contains("--open-panel") {
             // QA: open the expanded panel at launch.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.notch.expand() }
         } else if !self.store.hasConnections {
