@@ -93,6 +93,7 @@ struct OverviewColumn: View {
         switch meter.value {
         case .money where meter.id == "today": "Spent today"
         case .count(_, _, let unit): unit
+        case .unavailable where meter.id == UsageReading.unavailableGeminiSummaryID: ValueFormatter.compact(for: meter)
         default: meter.title
         }
     }

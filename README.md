@@ -134,7 +134,7 @@ When a provider is offline or a sign-in expires, Kazoo keeps the last reading, s
 | **Cursor** | Included plan usage, billing cycle end, on-demand spend | Use your cursor.com browser session |
 | **GitHub Copilot** | Premium-request quota, or AI credits used in the billing period | Sign in with GitHub (device code) |
 | **Gemini CLI** | Pro, Flash and Flash Lite quota buckets | Use the Gemini CLI sign-in on this Mac |
-| **Antigravity** | Gemini and Claude + GPT pools, each with session and weekly windows | Open the Antigravity app (or `agy` CLI), signed in with Google |
+| **Antigravity** | Gemini quota at a glance, with Gemini and Claude + GPT session and weekly windows in details | Open the Antigravity app (or `agy` CLI), signed in with Google |
 | **OpenCode** | 30-day spend, prepaid balance, or subscription windows | Use your opencode.ai browser session |
 | **OpenAI API** | Organization spend today and over 7 days, with a daily chart | Add an organization Admin key |
 
