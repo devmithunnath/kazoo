@@ -16,12 +16,12 @@ cask "kazoo" do
 
   app "Kazoo.app"
 
-  # Preview builds are ad-hoc signed, not notarized. Clear the download quarantine so Gatekeeper does not block
-  # the first launch. Remove this block once releases are signed with Developer ID and notarized.
-  postflight do
-    system_command "/usr/bin/xattr",
-                   args:         ["-dr", "com.apple.quarantine", "#{appdir}/Kazoo.app"],
-                   must_succeed: false
+  # Preview builds are not notarized. Clear the download quarantine so Gatekeeper does not block the first
+  # launch. Remove these steps once releases are signed with Developer ID and notarized.
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args:         ["-dr", "com.apple.quarantine", "{{appdir}}/Kazoo.app"],
+        must_succeed: false
   end
 
   uninstall quit: "com.pipboxes.kazoo"
