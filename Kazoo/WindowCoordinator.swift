@@ -25,6 +25,7 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
     private var settingsWindow: NSWindow?
 
     private let updates: UpdateController
+    private let settingsNavigation = SettingsNavigation()
 
     init(store: UsageStore, updates: UpdateController) {
         self.store = store
@@ -47,15 +48,17 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
         self.present(self.connectionsWindow)
     }
 
-    func showSettings() {
+    func showSettings(tab: SettingsTab? = nil) {
+        if let tab { self.settingsNavigation.tab = tab }
         if self.settingsWindow == nil {
-            let controller = NSHostingController(rootView: SettingsView(store: self.store, updates: self.updates) { [weak self] in
+            let controller = NSHostingController(rootView: SettingsView(store: self.store, updates: self.updates,
+                                                                   navigation: self.settingsNavigation) { [weak self] in
                 self?.showConnections()
             })
             let window = NSWindow(contentViewController: controller)
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-            window.setContentSize(NSSize(width: 520, height: 640))
-            window.setFrameAutosaveName("KazooSettings")
+            window.setContentSize(NSSize(width: 540, height: 620))
+            window.setFrameAutosaveName("KazooSettingsTabs")
             window.isReleasedWhenClosed = false
             window.delegate = self
             self.settingsWindow = window

@@ -102,7 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.startUpdateChecks()
         if arguments.contains("--open-settings") {
             // QA: open Settings at launch.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.windows.showSettings() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.windows.showSettings(tab: .updates) }
         } else if arguments.contains("--open-panel") {
             // QA: open the expanded panel at launch.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.notch.expand() }
@@ -161,7 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func menuCheckForUpdates() {
         self.dismissPanels()
-        self.windows.showSettings()
+        self.windows.showSettings(tab: .updates)
         if self.updates.availableRelease == nil { self.updates.checkNow() }
     }
 

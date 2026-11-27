@@ -137,6 +137,10 @@ func renderScreenshots(to out: URL) {
                                    installMethod: .homebrew(brewPath: "/opt/homebrew/bin/brew"),
                                    fetcher: nil, defaults: UserDefaults(suiteName: "kazoo.render") ?? .standard)
     captureWindow(SettingsView(store: connections, updates: updates, openConnections: {}),
-                  size: CGSize(width: 540, height: 1060), title: "Kazoo Settings",
+                  size: CGSize(width: 540, height: 760), title: "Kazoo Settings",
                   to: out.appendingPathComponent("settings.png"))
+    captureWindow(SettingsView(store: connections, updates: updates, navigation: SettingsNavigation(tab: .updates),
+                               openConnections: {}),
+                  size: CGSize(width: 540, height: 520), title: "Kazoo Settings",
+                  to: out.appendingPathComponent("settings-updates.png"))
 }

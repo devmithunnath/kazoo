@@ -159,7 +159,7 @@ The first command adds Kazoo's tap (this repository) to Homebrew; you only need 
 
 **Update**
 
-Open **Settings â†’ Updates** and click **Update with Homebrew** when a new version is available. Kazoo quits, runs the
+Open **Settings**, choose the **Updates** tab, and click **Update with Homebrew** when a new version is available. Kazoo quits, runs the
 Homebrew upgrade for you, and reopens. Or update from Terminal:
 
 ```bash
@@ -229,6 +229,10 @@ Kazoo checks GitHub for a new release once a day (turn this off in **Settings â†
 - **Installed with Homebrew:** **Update with Homebrew** runs `brew upgrade --cask kazoo` for you, so Homebrew stays
   in sync and `brew upgrade` keeps working too. Kazoo quits during the update and reopens when it's done.
 - **Downloaded manually:** **Download** opens the new release's zip.
+
+<p align="center">
+  <img src="docs/screenshots/settings-updates.png" width="420" alt="Settings, Updates tab">
+</p>
 
 ## Privacy & security
 

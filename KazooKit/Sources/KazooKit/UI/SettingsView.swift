@@ -1,22 +1,79 @@
 import ServiceManagement
 import SwiftUI
 
-/// Native Settings: favorite, pinned order, display, refresh, demo, about.
+/// The tabs of the Settings window.
+public enum SettingsTab: String, Hashable, Sendable {
+    case general
+    case updates
+    case about
+}
+
+/// Which Settings tab is showing; lets menu items such as "Check for Updates…" open a specific tab.
+@MainActor
+public final class SettingsNavigation: ObservableObject {
+    @Published public var tab: SettingsTab
+    public init(tab: SettingsTab = .general) { self.tab = tab }
+}
+
+/// Native Settings window: General (notch, pins, display, accounts), Updates, and About tabs.
 public struct SettingsView: View {
     @ObservedObject var store: UsageStore
     let updates: UpdateController?
+    @ObservedObject var navigation: SettingsNavigation
     let openConnections: () -> Void
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var launchError: String?
     @State private var showNotices = false
 
-    public init(store: UsageStore, updates: UpdateController? = nil, openConnections: @escaping () -> Void) {
+    public init(
+        store: UsageStore,
+        updates: UpdateController? = nil,
+        navigation: SettingsNavigation = SettingsNavigation(),
+        openConnections: @escaping () -> Void)
+    {
         self.store = store
         self.updates = updates
+        self.navigation = navigation
         self.openConnections = openConnections
     }
 
     public var body: some View {
+        TabView(selection: self.$navigation.tab) {
+            self.generalTab
+                .tabItem { Label("General", systemImage: "gearshape") }
+                .tag(SettingsTab.general)
+            if let updates {
+                Form { UpdatesSection(updates: updates) }
+                    .formStyle(.grouped)
+                    .tabItem { Label("Updates", systemImage: "arrow.down.circle") }
+                    .tag(SettingsTab.updates)
+            }
+            self.aboutTab
+                .tabItem { Label("About", systemImage: "info.circle") }
+                .tag(SettingsTab.about)
+        }
+        .padding(.top, 8)
+        .frame(minWidth: 480, minHeight: 520)
+        .sheet(isPresented: self.$showNotices) { NoticesView() }
+    }
+
+    private var aboutTab: some View {
+        Form {
+            Section {
+                if let updates {
+                    LabeledContent("Version", value: "\(updates.currentVersion) (\(updates.buildNumber))")
+                } else {
+                    LabeledContent("Version", value: Self.version)
+                }
+                LabeledContent("Provider engine", value: "CodexBarCore v0.85.0 (5dd48ca)")
+                Link("Kazoo on GitHub", destination: URL(string: "https://github.com/devmithunnath/kazoo")!)
+                Button("Third-party notices…") { self.showNotices = true }
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private var generalTab: some View {
         Form {
             Section("Collapsed notch") {
                 if self.store.connectedProviders.isEmpty {
@@ -89,10 +146,6 @@ public struct SettingsView: View {
                 }
             }
 
-            if let updates {
-                UpdatesSection(updates: updates)
-            }
-
             Section("Accounts") {
                 Button("Open Connections…", action: self.openConnections)
                 Toggle("Demo mode (sample data)", isOn: Binding(
@@ -102,17 +155,8 @@ public struct SettingsView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
 
-            Section("About") {
-                if self.updates == nil {
-                    LabeledContent("Version", value: Self.version)
-                }
-                LabeledContent("Provider engine", value: "CodexBarCore v0.85.0 (5dd48ca)")
-                Button("Third-party notices…") { self.showNotices = true }
-            }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 460, minHeight: 560)
-        .sheet(isPresented: self.$showNotices) { NoticesView() }
     }
 
     private func move(_ provider: ProviderID, by offset: Int) {
