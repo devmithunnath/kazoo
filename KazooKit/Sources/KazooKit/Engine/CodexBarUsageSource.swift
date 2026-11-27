@@ -84,6 +84,30 @@ public struct CodexBarUsageSource: UsageSource {
         }
     }
 
+    /// Maps CodexBarCore's reason for Antigravity's offline fallback to a failure with one clear fix.
+    static func antigravityLiveFailure(diagnostic: String?) -> FetchFailure {
+        let reason = (diagnostic ?? "")
+            .replacingOccurrences(of: "Live Antigravity usage is unavailable; showing offline data.", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let r = reason.lowercased()
+        if r.contains("not detected") || r.contains("launch antigravity") || r.contains("not running") || r.isEmpty {
+            return .companionNotRunning("Antigravity isn’t running. Open the Antigravity app (signed in with "
+                + "Google), then check again.")
+        }
+        if r.contains("sign in") || r.contains("signed in") || r.contains("log in") || r.contains("logged in")
+            || r.contains("authenticat") || r.contains("expired") || r.contains("401") || r.contains("403")
+        {
+            return .expired("Antigravity needs you to sign in again. Open Antigravity and sign in with Google, "
+                + "then check again.")
+        }
+        if r.contains("internet") || r.contains("network") || r.contains("offline") {
+            return .offline
+        }
+        let detail = reason.hasSuffix(".") ? String(reason.dropLast()) : reason
+        return .companionNotRunning("Couldn’t read live Antigravity usage (\(detail)). Open the Antigravity app, "
+            + "make sure you’re signed in, then check again.")
+    }
+
     /// Whether a failed fetch should be retried through the provider's own CLI (no Kazoo Keychain access).
     static func shouldRecoverWithOwnerCLI(
         provider: ProviderID,
@@ -152,9 +176,17 @@ public struct CodexBarUsageSource: UsageSource {
             for attempt in outcome.attempts {
                 print("attempt \(attempt.strategyID) available=\(attempt.wasAvailable) error=\(attempt.errorDescription ?? "-")")
             }
+            if case let .success(result) = outcome.result, let diagnostic = result.diagnostic {
+                print("diagnostic \(diagnostic)")
+            }
         }
         switch outcome.result {
         case let .success(result):
+            // Antigravity's offline fallback only counts local conversations; it has no quota. Report why live
+            // usage failed instead of presenting it as a signed-in account without usage.
+            if request.provider == .antigravity, result.sourceLabel == "offline" {
+                throw Self.antigravityLiveFailure(diagnostic: result.diagnostic)
+            }
             return SnapshotMapper.reading(
                 for: request.provider,
                 usage: result.usage,

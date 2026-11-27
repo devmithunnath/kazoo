@@ -94,6 +94,21 @@ struct FormattingTests {
         #expect(CodexBarUsageSource.rewordedForKazoo(.expired(
             "Codex auth.json needs refresh. Reauthenticate this account or run `codex login` in the same Codex home."))
             == .expired("Codex auth.json needs refresh. Sign in to Codex again from Connections."))
+        // Antigravity's offline fallback (conversation history, no quota) is reported as a live failure.
+        let notRunning = CodexBarUsageSource.antigravityLiveFailure(diagnostic:
+            "Live Antigravity usage is unavailable; showing offline data. Antigravity language server not detected. Launch Antigravity and retry.")
+        if case .companionNotRunning = notRunning {} else { Issue.record("expected companionNotRunning") }
+        if case .expired = CodexBarUsageSource.antigravityLiveFailure(diagnostic:
+            "Live Antigravity usage is unavailable; showing offline data. Sign in to Antigravity again.") {} else {
+            Issue.record("expected expired")
+        }
+        #expect(CodexBarUsageSource.antigravityLiveFailure(diagnostic:
+            "Live Antigravity usage is unavailable; showing offline data. The Internet connection appears to be offline.")
+            == .offline)
+        #expect(CodexBarUsageSource.antigravityLiveFailure(diagnostic:
+            "Live Antigravity usage is unavailable; showing offline data. the usage request failed (HTTP 500)")
+            == .companionNotRunning("Couldn’t read live Antigravity usage (the usage request failed (HTTP 500)). "
+                + "Open the Antigravity app, make sure you’re signed in, then check again."))
         #expect(FetchFailure.offline.isTransient)
         #expect(!FetchFailure.expired("x").isTransient)
     }

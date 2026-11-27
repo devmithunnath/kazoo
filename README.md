@@ -32,6 +32,7 @@ Click to compare providers. Connect everything from a native Mac window â€” no c
 
 ```bash
 brew tap devmithunnath/kazoo https://github.com/devmithunnath/kazoo
+brew update
 brew install --cask devmithunnath/kazoo/kazoo
 ```
 
@@ -151,11 +152,18 @@ AI Pro and Ultra accounts can no longer sign in to Gemini CLI (since June 2026);
 
 ```bash
 brew tap devmithunnath/kazoo https://github.com/devmithunnath/kazoo
+brew update
 brew install --cask devmithunnath/kazoo/kazoo
 open -a Kazoo
 ```
 
-The first command adds Kazoo's tap (this repository) to Homebrew; you only need it once.
+The first command adds Kazoo's tap (this repository) to Homebrew; you only need it once. `brew update` makes sure
+Homebrew has the newest Kazoo release.
+
+> [!IMPORTANT]
+> Homebrew keeps its own copy of the tap and only refreshes it about once a day. Running `brew tap` again does not
+> refresh it, and `brew uninstall` does not remove it, so a reinstall can bring back an older version. Always run
+> `brew update` before installing, and check the version Homebrew will install with `brew info --cask kazoo`.
 
 **Update**
 
@@ -242,6 +250,10 @@ Kazoo checks GitHub for a new release once a day (turn this off in **Settings â†
 - **You stay in control.** Sign-ins owned by other tools (Codex, Claude Code, Gemini CLI, your browser) are read
   only after you click connect, and macOS asks before Kazoo can open a Keychain item. Disconnecting removes
   everything Kazoo stored.
+
+## Uninstalling
+
+See [docs/UNINSTALL.md](docs/UNINSTALL.md) for removing Kazoo and everything it stores.
 
 ## How it works
 
