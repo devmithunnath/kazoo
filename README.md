@@ -27,6 +27,15 @@ Click to compare providers. Connect everything from a native Mac window — no c
 
 </div>
 
+## Quick install
+
+```bash
+brew tap devmithunnath/kazoo https://github.com/devmithunnath/kazoo
+brew install --cask devmithunnath/kazoo/kazoo
+```
+
+Then open **Kazoo** from Applications. See [Installation](#installation) for other options.
+
 ---
 
 ## Features
@@ -70,27 +79,61 @@ Codex usage reflects your ChatGPT plan and is kept separate from OpenAI API orga
 
 ### Requirements
 
-- macOS 14 Sonoma or later
+- macOS 14 Sonoma or later, on Apple silicon or Intel
 - A Mac with a notch for the notch view (any Mac works through the menu bar)
-- Xcode 26 to build from source
+
+### Homebrew (recommended)
+
+```bash
+brew tap devmithunnath/kazoo https://github.com/devmithunnath/kazoo
+brew install --cask devmithunnath/kazoo/kazoo
+open -a Kazoo
+```
+
+The first command adds Kazoo's tap (this repository) to Homebrew; you only need it once.
+
+**Update**
+
+```bash
+brew update && brew upgrade --cask kazoo
+```
+
+**Uninstall**
+
+```bash
+brew uninstall --cask kazoo
+```
+
+Add `--zap` to also remove Kazoo's preferences and cached readings. API keys stay in your Keychain under
+`com.pipboxes.kazoo.credentials` until you disconnect the provider in Kazoo or delete them in Keychain Access.
+
+> [!NOTE]
+> Preview builds are not yet notarized by Apple. The cask clears the download quarantine flag so macOS lets Kazoo
+> open. If you install manually instead, right-click **Kazoo.app** → **Open** the first time, or allow it in
+> **System Settings → Privacy & Security**.
+
+### Manual download
+
+Download `Kazoo-<version>.zip` from the [latest release](https://github.com/devmithunnath/kazoo/releases/latest),
+unzip it, and drag **Kazoo.app** into **Applications**.
 
 ### Build from source
 
+Requires Xcode 26.
+
 ```bash
-git clone git@github.com:devmithunnath/kazoo.git
+git clone https://github.com/devmithunnath/kazoo.git
 cd kazoo
 Scripts/build.sh
 open dist/Kazoo.app
 ```
 
-Prefer Xcode? Open `Kazoo.xcodeproj` and run the **Kazoo** scheme.
+The first build downloads the Swift package dependencies and takes a few minutes. Prefer Xcode? Open
+`Kazoo.xcodeproj` and run the **Kazoo** scheme.
 
 > [!TIP]
 > Want to look around before connecting anything? Launch with sample data:
 > `open dist/Kazoo.app --args --demo`
-
-Signed and notarized builds will be published on the [Releases](https://github.com/devmithunnath/kazoo/releases)
-page.
 
 ## Usage
 
