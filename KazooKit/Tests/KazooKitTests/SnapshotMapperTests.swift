@@ -147,4 +147,48 @@ struct SnapshotMapperTests {
         let reading = SnapshotMapper.reading(for: .opencode, usage: usage, sourceLabel: "web", now: self.now)
         #expect(reading.meters.map(\.title) == ["5-hour", "Weekly"])
     }
+
+    @Test func antigravityQuotaSummaryPoolsAndMostConstrainedSummary() {
+        let p = "antigravity-quota-summary-"
+        let usage = UsageSnapshot(
+            primary: self.window(36, minutes: 300, reset: 3600),
+            secondary: self.window(62, minutes: 300, reset: 1800),
+            extraRateWindows: [
+                NamedRateWindow(id: p + "gemini-5h", title: "Gemini Session", window: self.window(36, minutes: 300, reset: 3600)),
+                NamedRateWindow(id: p + "gemini-weekly", title: "Gemini Weekly", window: self.window(19, minutes: 10080, reset: 300_000)),
+                NamedRateWindow(id: p + "claude-gpt-5h", title: "Claude + GPT Session", window: self.window(62, minutes: 300, reset: 1800)),
+                NamedRateWindow(id: p + "claude-gpt-weekly", title: "Claude + GPT Weekly",
+                                window: self.window(0, minutes: 10080, reset: nil), usageKnown: false),
+            ],
+            updatedAt: self.now,
+            identity: ProviderIdentitySnapshot(providerID: nil, accountEmail: "me@example.com", accountOrganization: nil, loginMethod: "AI Pro"))
+        let reading = SnapshotMapper.reading(for: .antigravity, usage: usage, sourceLabel: "agy-cli", now: self.now)
+        // Summary buckets become the main meters; the pool representatives are not duplicated.
+        #expect(reading.meters.map(\.title) == ["Gemini Session", "Gemini Weekly", "Claude + GPT Session", "Claude + GPT Weekly"])
+        #expect(reading.meters.allSatisfy { $0.scope == .account })
+        // Unknown usage is unavailable, never shown as an empty (0%) quota.
+        #expect(reading.meters[3].isAvailable == false)
+        // Collapsed notch shows the most constrained known pool.
+        #expect(reading.summaryMeter?.remainingPercent == 38)
+        #expect(ValueFormatter.compact(for: reading.summaryMeter!) == "38% claude session left")
+        #expect(reading.sourceLabel == "Antigravity CLI")
+        #expect(reading.identity?.plan == "AI Pro")
+    }
+
+    @Test func antigravityLegacyPoolsWithModelRows() {
+        let usage = UsageSnapshot(
+            primary: self.window(20, minutes: nil, reset: 7200),
+            secondary: self.window(90, minutes: nil, reset: 7200),
+            extraRateWindows: [
+                NamedRateWindow(id: "gemini-3-pro", title: "Gemini 3 Pro", window: self.window(20, minutes: nil, reset: 7200)),
+                NamedRateWindow(id: "claude-sonnet", title: "Claude Sonnet", window: self.window(0, minutes: nil, reset: 7200),
+                                usageKnown: false),
+            ],
+            updatedAt: self.now)
+        let reading = SnapshotMapper.reading(for: .antigravity, usage: usage, sourceLabel: "local", now: self.now)
+        #expect(reading.accountMeters.map(\.title) == ["Gemini", "Claude + GPT"])
+        #expect(reading.modelMeters.map(\.title) == ["Gemini 3 Pro"]) // reset-only row skipped
+        #expect(reading.summaryMeter?.remainingPercent == 10)
+        #expect(reading.sourceLabel == "Antigravity app")
+    }
 }

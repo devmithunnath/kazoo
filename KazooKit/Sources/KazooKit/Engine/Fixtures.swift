@@ -65,6 +65,22 @@ public enum Fixtures {
                 ],
                 identity: AccountIdentity(email: "demo@example.com"),
                 sourceLabel: "Demo · Gemini CLI", isDemo: true)
+        case .antigravity:
+            let p = "antigravity-quota-summary-"
+            return UsageReading(
+                provider: .antigravity,
+                meters: [
+                    Meter(id: p + "gemini-5h", title: "Gemini Session", shortTitle: "gemini session",
+                          value: .remainingPercent(64), resetsAt: now.addingTimeInterval(3 * h + 1200)),
+                    Meter(id: p + "gemini-weekly", title: "Gemini Weekly", shortTitle: "gemini weekly",
+                          value: .remainingPercent(81), resetsAt: now.addingTimeInterval(98 * h)),
+                    Meter(id: p + "claude-gpt-5h", title: "Claude + GPT Session", shortTitle: "claude session",
+                          value: .remainingPercent(38), resetsAt: now.addingTimeInterval(1 * h + 900)),
+                    Meter(id: p + "claude-gpt-weekly", title: "Claude + GPT Weekly", shortTitle: "claude weekly",
+                          value: .remainingPercent(72), resetsAt: now.addingTimeInterval(98 * h)),
+                ],
+                identity: AccountIdentity(email: "demo@example.com", plan: "AI Pro"),
+                sourceLabel: "Demo · Antigravity app", isDemo: true)
         case .opencode:
             return UsageReading(
                 provider: .opencode,

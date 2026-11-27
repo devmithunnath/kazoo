@@ -74,6 +74,10 @@ struct FormattingTests {
             .notSignedIn("Claude OAuth credentials not found. Run `claude` to authenticate."))
         #expect(reworded == .notSignedIn("Claude OAuth credentials not found."))
         #expect(CodexBarUsageSource.rewordedForKazoo(.other("CodexBar failed")) == .other("Kazoo failed"))
+        let closed = FailureClassifier.classify(message: "Antigravity language server not detected. Launch Antigravity and retry.")
+        if case .companionNotRunning = closed {} else { Issue.record("expected companionNotRunning") }
+        #expect(closed.isTransient)
+        #expect(SetupGuide.guide(for: .antigravity).recoveryAction(for: closed.connectionStatus) == "Open Antigravity")
         #expect(FetchFailure.offline.isTransient)
         #expect(!FetchFailure.expired("x").isTransient)
     }

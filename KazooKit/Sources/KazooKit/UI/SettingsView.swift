@@ -92,7 +92,7 @@ public struct SettingsView: View {
                 Toggle("Demo mode (sample data)", isOn: Binding(
                     get: { self.store.isDemo },
                     set: { self.store.setDemoMode($0) }))
-                Text("Demo mode shows labeled sample readings for all seven providers. It never mixes with live data.")
+                Text("Demo mode shows labeled sample readings for every provider. It never mixes with live data.")
                     .font(.caption).foregroundStyle(.secondary)
             }
 

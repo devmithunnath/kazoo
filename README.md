@@ -6,12 +6,12 @@
 
 **Your AI usage, living in the MacBook notch.**
 
-Glance up to see how much Codex, Claude, Cursor, Copilot, Gemini, OpenCode and OpenAI API usage you have left.
+Glance up to see how much Codex, Claude, Cursor, Copilot, Gemini, Antigravity, OpenCode and OpenAI API usage you have left.
 Click to compare providers. Connect everything from a native Mac window — no config files, no terminal.
 
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](#requirements)
 [![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![Providers](https://img.shields.io/badge/providers-7-9EF58C)](#supported-providers)
+[![Providers](https://img.shields.io/badge/providers-8-9EF58C)](#supported-providers)
 [![Status](https://img.shields.io/badge/status-preview-orange)](#project-status)
 
 [Features](#features) •
@@ -70,10 +70,12 @@ Then open **Kazoo** from Applications. See [Installation](#installation) for oth
 | **Cursor** | Included plan usage, billing cycle end, on-demand spend | Use your cursor.com browser session |
 | **GitHub Copilot** | Premium-request quota, or AI credits used in the billing period | Sign in with GitHub (device code) |
 | **Gemini CLI** | Pro, Flash and Flash Lite quota buckets | Use the Gemini CLI sign-in on this Mac |
+| **Antigravity** | Gemini and Claude + GPT pools, each with session and weekly windows | Open the Antigravity app (or `agy` CLI), signed in with Google |
 | **OpenCode** | 30-day spend, prepaid balance, or subscription windows | Use your opencode.ai browser session |
 | **OpenAI API** | Organization spend today and over 7 days, with a daily chart | Add an organization Admin key |
 
-Codex usage reflects your ChatGPT plan and is kept separate from OpenAI API organization spend.
+Codex usage reflects your ChatGPT plan and is kept separate from OpenAI API organization spend. Google individual,
+AI Pro and Ultra accounts can no longer sign in to Gemini CLI (since June 2026); use Antigravity to track those quotas.
 
 ## Installation
 
@@ -174,7 +176,7 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the architecture, tests and d
 
 ## Project status
 
-Kazoo is an early preview. All seven providers are implemented and covered by tests. Claude has been verified
+Kazoo is an early preview. All eight providers are implemented and covered by tests. Claude has been verified
 against a live account; the others are still being exercised end to end. Bug reports and feedback are very welcome
 in [Issues](https://github.com/devmithunnath/kazoo/issues).
 

@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// All applicable windows for one provider, each with its own value and reset.
@@ -57,14 +58,16 @@ struct ProviderDetailView: View {
             if main.count == 1, let only = main.first {
                 HeroMeter(meter: only, now: self.store.now)
             } else {
-                ForEach(Array(stride(from: 0, to: main.count, by: 3)), id: \.self) { start in
+                let perRow = main.count == 4 ? 2 : 3
+                ForEach(Array(stride(from: 0, to: main.count, by: perRow)), id: \.self) { start in
                     HStack(alignment: .top, spacing: 0) {
-                        ForEach(Array(main[start..<min(start + 3, main.count)].enumerated()), id: \.element.id) { index, meter in
+                        ForEach(Array(main[start..<min(start + perRow, main.count)].enumerated()), id: \.element.id) { index, meter in
                             if index > 0 {
                                 Rectangle().fill(KazooTheme.divider).frame(width: 1).padding(.horizontal, 32)
                             }
                             MeterColumn(meter: meter, now: self.store.now,
-                                        numeralSize: meter.gauge == nil ? 72 : 60)
+                                        numeralSize: main.count > 3 ? 46 : (meter.gauge == nil ? 72 : 60),
+                                        compact: main.count > 3)
                         }
                     }
                     .fixedSize(horizontal: false, vertical: true)
@@ -119,6 +122,8 @@ struct StatusBanner: View {
             if let action = SetupGuide.guide(for: self.provider).recoveryAction(for: self.status) {
                 Button(action) {
                     switch self.status {
+                    case .failed where self.provider == .antigravity:
+                        self.openCompanionAppThenRefresh()
                     case .offline, .failed: self.store.refresh(self.provider, manual: true)
                     default: self.actions.openConnections(self.provider)
                     }
@@ -130,6 +135,20 @@ struct StatusBanner: View {
         .padding(12)
         .frame(maxWidth: 520, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.07)))
+    }
+
+    private func openCompanionAppThenRefresh() {
+        guard case let .localAccount(cli) = SetupGuide.guide(for: self.provider).kind, let url = cli.appURL else {
+            self.store.refresh(self.provider, manual: true)
+            return
+        }
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+        let store = self.store
+        let provider = self.provider
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            store.refresh(provider, manual: true)
+        }
     }
 
     private var title: String {

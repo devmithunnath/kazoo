@@ -38,11 +38,13 @@ public enum FetchFailure: Error, Sendable, Equatable, LocalizedError {
     case usageUnavailable(String)
     /// macOS needs the user's permission (e.g. Keychain access) before the sign-in can be read.
     case needsPermission(String)
+    /// The provider's companion app must be running (e.g. Antigravity). Transient: the last reading is kept.
+    case companionNotRunning(String)
     case other(String)
 
     public var errorDescription: String? {
         switch self {
-        case let .notSignedIn(m), let .expired(m), let .usageUnavailable(m), let .needsPermission(m), let .other(m): m
+        case let .notSignedIn(m), let .expired(m), let .usageUnavailable(m), let .needsPermission(m), let .companionNotRunning(m), let .other(m): m
         case .offline: "The network is unavailable."
         case .rateLimited: "The provider is rate-limiting requests. Kazoo will retry later."
         }
@@ -51,7 +53,7 @@ public enum FetchFailure: Error, Sendable, Equatable, LocalizedError {
     /// Whether a cached reading should be kept (transient) rather than cleared.
     public var isTransient: Bool {
         switch self {
-        case .offline, .rateLimited, .other: true
+        case .offline, .rateLimited, .other, .companionNotRunning: true
         case .notSignedIn, .expired, .usageUnavailable, .needsPermission: false
         }
     }
@@ -64,6 +66,7 @@ public enum FetchFailure: Error, Sendable, Equatable, LocalizedError {
         case .rateLimited: .connected
         case let .usageUnavailable(m): .usageUnavailable(m)
         case let .needsPermission(m): .failed(m)
+        case let .companionNotRunning(m): .failed(m)
         case let .other(m): .failed(m)
         }
     }
@@ -104,6 +107,10 @@ public enum FailureClassifier {
             || m.contains("keychain access") || m.contains("errsecusercanceled") || m.contains("user canceled")
         {
             return .needsPermission(Self.permissionMessage)
+        }
+        if m.contains("language server not detected") || m.contains("launch antigravity") {
+            return .companionNotRunning("Antigravity isn’t running. Open the Antigravity app (signed in with Google), "
+                + "then check again.")
         }
         if m.contains("429") || m.contains("rate limit") || m.contains("rate-limit") || m.contains("too many requests") {
             return .rateLimited(retryAfter: nil)

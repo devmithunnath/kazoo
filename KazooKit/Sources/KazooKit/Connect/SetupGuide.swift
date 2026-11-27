@@ -1,3 +1,4 @@
+import AppKit
 import CodexBarCore
 import Foundation
 
@@ -10,6 +11,14 @@ public struct CompanionCLI: Sendable, Equatable {
     public let browserLoginArguments: [String]?
     /// Whether the CLI prints the authorization link instead of opening the browser itself.
     public let opensLinkItself: Bool
+    /// A desktop app that can serve the data instead of the CLI (e.g. Antigravity.app).
+    public var appBundleID: String? = nil
+    public var appName: String? = nil
+
+    /// Whether the companion desktop app is installed.
+    public var appURL: URL? {
+        self.appBundleID.flatMap { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0) }
+    }
 
     /// Resolves the CLI using the login-shell PATH and well-known install locations (CodexBar's `BinaryLocator`).
     public func resolve() -> String? {
@@ -17,6 +26,7 @@ public struct CompanionCLI: Sendable, Equatable {
         case "codex": BinaryLocator.resolveCodexBinary()
         case "claude": BinaryLocator.resolveClaudeBinary()
         case "gemini": BinaryLocator.resolveGeminiBinary()
+        case "agy": BinaryLocator.resolveAntigravityBinary()
         default: nil
         }
     }
@@ -95,8 +105,23 @@ public struct SetupGuide: Sendable, Equatable {
                     installURL: URL(string: "https://github.com/google-gemini/gemini-cli#-installation")!,
                     browserLoginArguments: nil, opensLinkItself: true)),
                 permissionNote: "Source: Gemini CLI. Kazoo reads the Google sign-in the Gemini CLI saved on this "
-                    + "Mac (~/.gemini) and shows its per-model quota. The Gemini web app is not supported yet.",
+                    + "Mac (~/.gemini) and shows its per-model quota. The Gemini web app is not supported yet. "
+                    + "Google individual, AI Pro, and Ultra accounts lost Gemini CLI sign-in in June 2026 — use "
+                    + "Antigravity for those.",
                 docsURL: URL(string: "https://github.com/steipete/CodexBar/blob/main/docs/gemini.md")!)
+        case .antigravity:
+            SetupGuide(
+                provider: .antigravity,
+                primaryAction: "Use Antigravity on this Mac",
+                kind: .localAccount(CompanionCLI(
+                    command: "agy", displayName: "Antigravity CLI",
+                    installURL: URL(string: "https://antigravity.google")!,
+                    browserLoginArguments: nil, opensLinkItself: true,
+                    appBundleID: "com.google.antigravity", appName: "Antigravity")),
+                permissionNote: "Open the Antigravity app and sign in with Google, then connect. Kazoo reads quota "
+                    + "from the app running on this Mac, or from the Antigravity CLI (agy) when the app is closed. "
+                    + "Nothing is sent anywhere except Google’s own endpoints.",
+                docsURL: URL(string: "https://github.com/steipete/CodexBar/blob/main/docs/antigravity.md")!)
         case .opencode:
             SetupGuide(
                 provider: .opencode,
@@ -130,6 +155,7 @@ public struct SetupGuide: Sendable, Equatable {
             case .browserSession: "Check again"
             case let .localAccount(cli): cli.browserLoginArguments == nil ? "Check again" : "Sign in again"
             }
+        case .failed where self.provider == .antigravity: "Open Antigravity"
         case .offline, .failed: "Try again"
         case .usageUnavailable: "Check again"
         default: nil

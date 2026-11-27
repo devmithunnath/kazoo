@@ -378,7 +378,7 @@ public final class UsageStore: ObservableObject {
             let delay = retryAfter ?? Self.backoffDelay(failures: count)
             self.backoffUntil[provider] = self.clock().addingTimeInterval(delay)
             if self.statuses[provider] == .connecting { self.statuses[provider] = .connected }
-        case .offline, .other:
+        case .offline, .other, .companionNotRunning:
             self.backoffUntil[provider] = self.clock().addingTimeInterval(Self.backoffDelay(failures: count))
             self.statuses[provider] = failure.connectionStatus
         case .expired, .notSignedIn:

@@ -118,7 +118,7 @@ struct ConnectionsWelcome: View {
                 Button("Turn off demo mode") { self.store.setDemoMode(false) }
             } else if !self.store.hasConnections {
                 Button("Explore with demo data") { self.store.setDemoMode(true) }
-                    .help("Shows sample readings for all seven providers. Clearly labeled as demo data.")
+                    .help("Shows sample readings for every provider. Clearly labeled as demo data.")
                 Text("Demo data is sample data, not your usage.")
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -277,6 +277,12 @@ struct ConnectDetailView: View {
                     .disabled(self.model.isBusy)
             }
         case let .localAccount(cli):
+            if let appName = cli.appName {
+                LabeledContent("\(appName) app") {
+                    Text(cli.appURL != nil ? "Installed" : "Not found")
+                        .foregroundStyle(cli.appURL != nil ? Color.green : Color.secondary)
+                }
+            }
             LabeledContent(cli.displayName) {
                 if let path = self.model.companionPath {
                     Text("Found").foregroundStyle(.green).help(path)
@@ -324,7 +330,12 @@ struct ConnectDetailView: View {
                 Label(message, systemImage: "person.crop.circle.badge.exclamationmark")
                     .fixedSize(horizontal: false, vertical: true)
                 if let cli = self.model.companion {
-                    if self.model.companionPath != nil {
+                    if let appName = cli.appName, cli.appURL != nil {
+                        HStack {
+                            Button("Open \(appName)") { self.model.openCompanionApp() }
+                            Button("Check again") { self.model.verify(secret: nil) }
+                        }
+                    } else if self.model.companionPath != nil {
                         Button(cli.browserLoginArguments == nil ? "Open \(cli.displayName) to sign in"
                                                                 : "Sign in with \(cli.displayName)") {
                             self.model.signInWithCompanion()

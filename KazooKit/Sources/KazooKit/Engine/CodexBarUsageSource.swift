@@ -12,6 +12,7 @@ extension ProviderID {
         case .cursor: .cursor
         case .copilot: .copilot
         case .gemini: .gemini
+        case .antigravity: .antigravity
         case .opencode: .opencode
         case .openai: .openai
         }
@@ -22,7 +23,7 @@ extension ProviderID {
         switch self {
         case .gemini, .copilot, .openai: .api
         case .opencode: .web
-        case .codex, .claude, .cursor: .auto
+        case .codex, .claude, .cursor, .antigravity: .auto
         }
     }
 
@@ -33,6 +34,7 @@ extension ProviderID {
         case .claude: [("auto", "Automatic"), ("oauth", "Claude Code sign-in"), ("cli", "Claude CLI"),
                        ("web", "Browser session")]
         case .cursor: [("auto", "Automatic"), ("web", "Browser session")]
+        case .antigravity: [("auto", "Automatic"), ("cli", "Antigravity CLI (agy)")]
         default: []
         }
     }
@@ -124,6 +126,7 @@ public struct CodexBarUsageSource: UsageSource {
         case let .expired(m): return .expired(clean(m))
         case let .usageUnavailable(m): return .usageUnavailable(clean(m))
         case let .needsPermission(m): return .needsPermission(clean(m))
+        case let .companionNotRunning(m): return .companionNotRunning(clean(m))
         case let .other(m): return .other(clean(m))
         case .offline, .rateLimited: return failure
         }

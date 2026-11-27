@@ -95,7 +95,7 @@ struct EmptyPanelView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("No providers connected").font(KazooTheme.title(24))
-            Text("Connect Codex, Claude, Cursor, Copilot, Gemini CLI, OpenCode, or the OpenAI API to see how much you have left.")
+            Text("Connect Codex, Claude, Cursor, Copilot, Gemini CLI, Antigravity, OpenCode, or the OpenAI API to see how much you have left.")
                 .font(.system(size: 14))
                 .foregroundStyle(KazooTheme.secondaryText)
                 .frame(width: 380, alignment: .leading)

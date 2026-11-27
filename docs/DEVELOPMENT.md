@@ -19,8 +19,8 @@ Launch arguments (enable them in the scheme, or pass with `open dist/Kazoo.app -
 
 | Argument | Effect |
 |---|---|
-| `--demo` | In-memory session with labeled sample data for all seven providers. Never touches saved accounts or Keychain. |
-| `--favorite <id>` | With `--demo`: provider shown in the collapsed notch (`codex`, `claude`, `cursor`, `copilot`, `gemini`, `opencode`, `openai`). |
+| `--demo` | In-memory session with labeled sample data for every provider. Never touches saved accounts or Keychain. |
+| `--favorite <id>` | With `--demo`: provider shown in the collapsed notch (`codex`, `claude`, `cursor`, `copilot`, `gemini`, `antigravity`, `opencode`, `openai`). |
 | `--pinned <ids>` | With `--demo`: comma-separated pinned providers. |
 | `--open-panel` | Opens the expanded panel at launch. |
 
@@ -30,7 +30,7 @@ Launch arguments (enable them in the scheme, or pass with `open dist/Kazoo.app -
 cd KazooKit && swift test
 ```
 
-The suite covers units and timing (gauge math, countdowns, missing vs zero), snapshot mapping for all seven
+The suite covers units and timing (gauge math, countdowns, missing vs zero), snapshot mapping for all eight
 providers against CodexBarCore types, store behavior (refresh dedupe, backoff, offline cache, expired sign-in,
 account switches mid-request, reset confirmation, demo isolation, permission prompts only on user actions), and
 panel routing.
@@ -84,7 +84,8 @@ may show macOS Keychain prompts.
 | Claude | Live-tested: real reading through CodexBarCore (CLI source) |
 | Codex | Live-tested error path (expired sign-in classified correctly); reading fixture-tested |
 | Gemini CLI | Live-tested not-signed-in path; reading fixture-tested |
+| Antigravity | Live-tested app-not-running path (shows "Open Antigravity"); reading fixture-tested. A live reading needs the app open and signed in. |
 | Cursor, GitHub Copilot, OpenCode, OpenAI API | Fixture-tested; live accounts not yet exercised |
 
 Still to verify by hand: every connect flow end to end, external displays, sleep and wake, keyboard
-navigation, VoiceOver, Reduce Motion, and one, three and seven live providers.
+navigation, VoiceOver, Reduce Motion, and one, three and eight live providers.

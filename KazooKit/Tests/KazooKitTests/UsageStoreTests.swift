@@ -206,7 +206,7 @@ struct UsageStoreTests {
         await source.enqueue(.codex, .success(Make.percentReading(.codex, [("w", 70, .account)])))
         _ = await store.connect(.codex)
         store.setDemoMode(true)
-        #expect(store.connectedProviders.count == 7)
+        #expect(store.connectedProviders.count == ProviderID.allCases.count)
         #expect(store.reading(for: .codex)?.isDemo == true)
         #expect(cache.load()[.codex]?.isDemo == false)
         await source.enqueue(.codex, .success(Make.percentReading(.codex, [("w", 65, .account)])))
@@ -272,6 +272,6 @@ struct PanelRouterTests {
         #expect(ProviderID.copilot.matches(search: "github"))
         #expect(ProviderID.openai.matches(search: "admin"))
         #expect(!ProviderID.cursor.matches(search: "gemini"))
-        #expect(ProviderID.allCases.filter { $0.matches(search: "") }.count == 7)
+        #expect(ProviderID.allCases.filter { $0.matches(search: "") }.count == 8)
     }
 }

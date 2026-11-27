@@ -95,6 +95,9 @@ public final class ConnectFlowModel: ObservableObject {
                 self.phase = .done
             case let .failure(failure):
                 switch (self.guide.kind, failure) {
+                case (.localAccount, .companionNotRunning(let message)):
+                    self.detectCompanion()
+                    self.phase = .needsCompanion(message)
                 case (_, .needsPermission(let message)):
                     self.phase = .failed(message)
                 case (_, .usageUnavailable):
@@ -159,6 +162,19 @@ public final class ConnectFlowModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 self.phase = .failed((error as? FetchFailure)?.errorDescription ?? error.localizedDescription)
             }
+        }
+    }
+
+    /// Opens the companion desktop app (e.g. Antigravity), then re-checks after it has had time to start.
+    public func openCompanionApp() {
+        guard let url = self.companion?.appURL else { return }
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+        self.phase = .verifying
+        self.task?.cancel()
+        self.task = Task {
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            guard !Task.isCancelled else { return }
+            self.verify(secret: nil)
         }
     }
 

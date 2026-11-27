@@ -51,6 +51,9 @@ public enum SnapshotMapper {
                                                scope: .model, forceTitle: usage.tertiary?.title == nil)
             reading.meters += self.extraMeters(usage.extraRateWindows, scope: .model)
 
+        case .antigravity:
+            reading.meters = self.antigravityMeters(usage)
+
         case .cursor:
             reading.meters += self.windowMeter(usage.primary, id: "primary", fallback: ("Included plan usage", "plan"),
                                                forceTitle: true)
@@ -146,6 +149,43 @@ public enum SnapshotMapper {
         return reading
     }
 
+    // MARK: - Antigravity
+
+    static let antigravitySummaryPrefix = "antigravity-quota-summary-"
+
+    /// Antigravity reports two real pools (Gemini, Claude + GPT). Quota-summary buckets (session/weekly per pool)
+    /// become the main meters; otherwise the pool representatives are used. Per-model rows are listed as
+    /// model-specific, and rows without a remaining fraction (reset context only) are skipped, never shown as empty.
+    static func antigravityMeters(_ usage: UsageSnapshot) -> [Meter] {
+        let extras = usage.extraRateWindows ?? []
+        let summary = extras.filter { $0.id.hasPrefix(self.antigravitySummaryPrefix) }
+        if !summary.isEmpty {
+            return summary.map { named in
+                let short = self.antigravityShortTitle(named.title)
+                guard named.usageKnown, let measured = named.window.measured else {
+                    return Meter(id: named.id, title: named.title, shortTitle: short,
+                                 value: .unavailable(reason: "Not reported"))
+                }
+                return Meter(id: named.id, title: named.title, shortTitle: short,
+                             value: .remainingPercent(measured.remainingPercent),
+                             resetsAt: measured.resetsAt, resetDescription: measured.resetDescription)
+            }
+        }
+        var meters: [Meter] = []
+        meters += self.windowMeter(usage.primary, id: "primary", fallback: ("Gemini", "gemini"), forceTitle: true)
+        meters += self.windowMeter(usage.secondary, id: "secondary", fallback: ("Claude + GPT", "claude/gpt"),
+                                   forceTitle: true)
+        meters += self.extraMeters(extras.filter(\.usageKnown), scope: .model)
+        return meters
+    }
+
+    /// "Claude + GPT Weekly" → "claude weekly", "Gemini Session" → "gemini session" (fits the notch wing).
+    static func antigravityShortTitle(_ title: String) -> String {
+        title.lowercased()
+            .replacingOccurrences(of: "claude + gpt", with: "claude")
+            .replacingOccurrences(of: "claude/gpt", with: "claude")
+    }
+
     // MARK: - Helpers
 
     static func windowMeter(
@@ -210,6 +250,15 @@ public enum SnapshotMapper {
 
     static func sourceLabel(provider: ProviderID, raw: String) -> String {
         if provider == .gemini { return "Gemini CLI" }
+        if provider == .antigravity {
+            switch raw.lowercased() {
+            case let s where s.contains("cli") || s.contains("agy"): return "Antigravity CLI"
+            case let s where s.contains("oauth"): return "Google account"
+            case let s where s.contains("offline"): return "Offline history"
+            case let s where s.contains("local") || s.contains("app"): return "Antigravity app"
+            default: return raw
+            }
+        }
         return raw
     }
 }

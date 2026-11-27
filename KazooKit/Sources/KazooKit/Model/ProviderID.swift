@@ -1,12 +1,13 @@
 import Foundation
 
-/// The seven providers Kazoo supports. App-owned so that views never depend on CodexBarCore types.
+/// The providers Kazoo supports. App-owned so that views never depend on CodexBarCore types.
 public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, Hashable {
     case codex
     case claude
     case cursor
     case copilot
     case gemini
+    case antigravity
     case opencode
     case openai
 
@@ -20,6 +21,7 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         case .cursor: "Cursor"
         case .copilot: "GitHub Copilot"
         case .gemini: "Gemini CLI"
+        case .antigravity: "Antigravity"
         case .opencode: "OpenCode"
         case .openai: "OpenAI API"
         }
@@ -33,6 +35,7 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         case .cursor: "Cursor"
         case .copilot: "Copilot"
         case .gemini: "Gemini"
+        case .antigravity: "Antigravity"
         case .opencode: "OpenCode"
         case .openai: "OpenAI"
         }
@@ -46,6 +49,7 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         case .cursor: "Included plan usage, billing cycle, and on-demand charges."
         case .copilot: "Premium request quota or AI credits used in the billing period."
         case .gemini: "Gemini CLI quota buckets (Pro, Flash) for the signed-in Google account."
+        case .antigravity: "Google Antigravity quota: Gemini and Claude + GPT pools, session and weekly."
         case .opencode: "Workspace spend, prepaid balance, or subscription quota windows."
         case .openai: "OpenAI API organization spend (requires an Admin key)."
         }
@@ -59,6 +63,7 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         case .cursor: ["ide", "editor"]
         case .copilot: ["github", "microsoft"]
         case .gemini: ["google", "gemini cli"]
+        case .antigravity: ["google", "gemini", "agy", "claude", "gpt", "ide"]
         case .opencode: ["zen", "workspace", "sst"]
         case .openai: ["api", "platform", "organization", "admin key", "spend"]
         }
@@ -71,8 +76,9 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         return self.searchKeywords.contains { $0.contains(q) }
     }
 
-    /// Providers whose collapsed summary is the lowest remaining account-wide window.
+    /// Providers whose collapsed summary is the lowest remaining account-wide window (for Antigravity, the most
+    /// constrained quota pool).
     public var summarizesLowestAccountWindow: Bool {
-        self == .codex || self == .claude
+        self == .codex || self == .claude || self == .antigravity
     }
 }

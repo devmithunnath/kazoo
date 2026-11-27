@@ -1,6 +1,6 @@
 cask "kazoo" do
   version "0.1.0"
-  sha256 "2203cec63927ea6abc7f110bcf196544257dece42138f52e93d24e9c7f3d94fa"
+  sha256 "8d145e7081e5bfcf0fe7b7f5370201b19b1c781ccd367f31f55abe06c17ea891"
 
   url "https://github.com/devmithunnath/kazoo/releases/download/v#{version}/Kazoo-#{version}.zip"
   name "Kazoo"

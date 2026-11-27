@@ -52,17 +52,20 @@ struct MeterColumn: View {
     let meter: Meter
     let now: Date
     var numeralSize: CGFloat = 60
+    /// Shorter grid for dense layouts (four or more windows).
+    var compact = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: self.compact ? 8 : 10) {
             Text(self.meter.title)
                 .font(.system(size: 18))
                 .foregroundStyle(KazooTheme.primaryText.opacity(0.88))
                 .lineLimit(1)
             NumeralText(meter: self.meter, size: self.numeralSize)
             if let gauge = self.meter.gauge {
-                SquareGrid(gauge: gauge, columns: 7, rows: 6, square: 17, spacing: 5)
-                    .padding(.top, 4)
+                SquareGrid(gauge: gauge, columns: self.compact ? 10 : 7, rows: self.compact ? 3 : 6,
+                           square: self.compact ? 13 : 17, spacing: self.compact ? 4 : 5)
+                    .padding(.top, self.compact ? 2 : 4)
             }
             if let caption = self.meter.caption {
                 Text(caption).font(.system(size: 15)).foregroundStyle(KazooTheme.secondaryText)
