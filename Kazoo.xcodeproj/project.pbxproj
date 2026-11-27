@@ -1,0 +1,291 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+/* Begin PBXBuildFile section */
+		4B3254D2764C2F13373A8A07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE93637AEA50C195136F48C9 /* AppDelegate.swift */; };
+		F56B748938497A0DC38E981E /* NotchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81E14DEDB81EB88FC1AEE12 /* NotchController.swift */; };
+		B6964903814234AA58D8B6F6 /* NotchGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 420881D654856BC82A9E34DD /* NotchGeometry.swift */; };
+		E48DA8228387ECEB7B1DF208 /* StatusItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F6A2F926A59DE5E7057AC4 /* StatusItemController.swift */; };
+		DBEF7502B1E8D1BC062B3BB0 /* WindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61891225D31E90E0CE8ADAFE /* WindowCoordinator.swift */; };
+		4B4BEA04FFECDFB5062A294E /* KazooKit in Frameworks */ = {isa = PBXBuildFile; productRef = 00503321D52B863944EC01FA /* KazooKit */; };
+		262673F27DBD85E2AEF9A09A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBE03F3784F40D95E23D8465 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7F6D01D6546BCD07518D8398 /* Kazoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kazoo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE93637AEA50C195136F48C9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F81E14DEDB81EB88FC1AEE12 /* NotchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchController.swift; sourceTree = "<group>"; };
+		420881D654856BC82A9E34DD /* NotchGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGeometry.swift; sourceTree = "<group>"; };
+		D4F6A2F926A59DE5E7057AC4 /* StatusItemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemController.swift; sourceTree = "<group>"; };
+		61891225D31E90E0CE8ADAFE /* WindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCoordinator.swift; sourceTree = "<group>"; };
+		00C6909BACF0CB8349047A8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9A940B763DA8B50352F4EF5B /* Kazoo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Kazoo.entitlements; sourceTree = "<group>"; };
+		710A48223C730D107B5A04BC /* KazooKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = KazooKit; sourceTree = "<group>"; };
+		BBE03F3784F40D95E23D8465 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3806DEFC96CD30D22C0E71FE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B4BEA04FFECDFB5062A294E /* KazooKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				710A48223C730D107B5A04BC /* KazooKit */,
+				20F4BD606C0F6D1645AE4919 /* Kazoo */,
+				EC148643C97903A61FBA5521 /* Frameworks */,
+				0A2C978E52A76F0AA9F68BB5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		20F4BD606C0F6D1645AE4919 /* Kazoo */ = {
+			isa = PBXGroup;
+			children = (
+				FE93637AEA50C195136F48C9 /* AppDelegate.swift */,
+				F81E14DEDB81EB88FC1AEE12 /* NotchController.swift */,
+				420881D654856BC82A9E34DD /* NotchGeometry.swift */,
+				D4F6A2F926A59DE5E7057AC4 /* StatusItemController.swift */,
+				61891225D31E90E0CE8ADAFE /* WindowCoordinator.swift */,
+				BBE03F3784F40D95E23D8465 /* Assets.xcassets */,
+				00C6909BACF0CB8349047A8D /* Info.plist */,
+				9A940B763DA8B50352F4EF5B /* Kazoo.entitlements */,
+			);
+			path = Kazoo;
+			sourceTree = "<group>";
+		};
+		EC148643C97903A61FBA5521 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0A2C978E52A76F0AA9F68BB5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F6D01D6546BCD07518D8398 /* Kazoo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* Kazoo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 772DED9DFD458CF34E21AFCE /* Build configuration list for PBXNativeTarget "Kazoo" */;
+			buildPhases = (
+				DBAEDAAE674BE07D23447E75 /* Sources */,
+				3806DEFC96CD30D22C0E71FE /* Frameworks */,
+				B098093DFB498EF325D85EDF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Kazoo;
+			packageProductDependencies = (
+				00503321D52B863944EC01FA /* KazooKit */,
+			);
+			productName = Kazoo;
+			productReference = 7F6D01D6546BCD07518D8398 /* Kazoo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				ORGANIZATIONNAME = PipBoxes;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 6D7F5B15D0375C8E47D52728 /* Build configuration list for PBXProject "Kazoo" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B731CEFC6751AAE0EC69B98;
+			packageReferences = (
+				715E1E3F015A64BA0327CAEF /* XCLocalSwiftPackageReference "KazooKit" */,
+			);
+			productRefGroup = 0A2C978E52A76F0AA9F68BB5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* Kazoo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B098093DFB498EF325D85EDF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				262673F27DBD85E2AEF9A09A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DBAEDAAE674BE07D23447E75 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B3254D2764C2F13373A8A07 /* AppDelegate.swift in Sources */,
+				F56B748938497A0DC38E981E /* NotchController.swift in Sources */,
+				B6964903814234AA58D8B6F6 /* NotchGeometry.swift in Sources */,
+				E48DA8228387ECEB7B1DF208 /* StatusItemController.swift in Sources */,
+				DBEF7502B1E8D1BC062B3BB0 /* WindowCoordinator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4257995D5FEB097455192277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CE7A3CB3B7BB14CB7E72BBF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		A3F61B41957AEA1EFA63EB05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Kazoo/Kazoo.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Kazoo/Info.plist;
+				KAZOO_DISPLAY_NAME = Kazoo;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipboxes.kazoo;
+				PRODUCT_NAME = Kazoo;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		FF8312F936D3A28646D453F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Kazoo/Kazoo.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Kazoo/Info.plist;
+				KAZOO_DISPLAY_NAME = Kazoo;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pipboxes.kazoo;
+				PRODUCT_NAME = Kazoo;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6D7F5B15D0375C8E47D52728 /* Build configuration list for PBXProject "Kazoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4257995D5FEB097455192277 /* Debug */,
+				CE7A3CB3B7BB14CB7E72BBF7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		772DED9DFD458CF34E21AFCE /* Build configuration list for PBXNativeTarget "Kazoo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3F61B41957AEA1EFA63EB05 /* Debug */,
+				FF8312F936D3A28646D453F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		715E1E3F015A64BA0327CAEF /* XCLocalSwiftPackageReference "KazooKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = KazooKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		00503321D52B863944EC01FA /* KazooKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KazooKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

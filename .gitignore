@@ -1,0 +1,7 @@
+build/
+dist/
+KazooKit/.build/
+KazooKit/.swiftpm/
+*.xcuserstate
+xcuserdata/
+.DS_Store
