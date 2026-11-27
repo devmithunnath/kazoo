@@ -128,7 +128,7 @@ public enum ValueFormatter {
         case let .count(used, _, _):
             return "\(count(used)) \(meter.shortTitle)"
         case .unavailable:
-            return "—"
+            return meter.id == UsageReading.unavailableGeminiSummaryID ? "Gemini quota unavailable" : "—"
         }
     }
 }

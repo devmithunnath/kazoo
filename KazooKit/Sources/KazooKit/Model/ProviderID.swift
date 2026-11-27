@@ -76,8 +76,7 @@ public enum ProviderID: String, CaseIterable, Codable, Sendable, Identifiable, H
         return self.searchKeywords.contains { $0.contains(q) }
     }
 
-    /// Providers whose collapsed summary is the lowest remaining account-wide window (for Antigravity, the most
-    /// constrained quota pool).
+    /// Providers whose summary shows their lowest remaining quota window. Antigravity uses the Gemini pool.
     public var summarizesLowestAccountWindow: Bool {
         self == .codex || self == .claude || self == .antigravity
     }

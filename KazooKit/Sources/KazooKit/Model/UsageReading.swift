@@ -182,15 +182,25 @@ public struct UsageReading: Codable, Sendable, Equatable {
     public var accountMeters: [Meter] { self.meters.filter { $0.scope == .account } }
     public var modelMeters: [Meter] { self.meters.filter { $0.scope == .model } }
 
+    static let unavailableGeminiSummaryID = "antigravity-gemini-unavailable"
+
     /// The one reading shown in the collapsed notch and overview column.
     ///
-    /// Codex and Claude use the lowest remaining percentage among account-wide windows, so a model-specific limit
-    /// can never make the whole account look exhausted. Others use their first available meter.
+    /// Codex and Claude summarize account-wide windows. Antigravity summarizes the shared Gemini pool.
     public var summaryMeter: Meter? {
         if self.provider.summarizesLowestAccountWindow {
-            let candidates = self.accountMeters.filter { $0.remainingPercent != nil }
+            let candidates = self.accountMeters.filter { meter in
+                guard meter.remainingPercent != nil else { return false }
+                guard self.provider == .antigravity else { return true }
+                return meter.id.hasPrefix("antigravity-quota-summary-gemini-")
+                    || (meter.id == "primary" && meter.title == "Gemini")
+            }
             if let lowest = candidates.min(by: { ($0.remainingPercent ?? 0) < ($1.remainingPercent ?? 0) }) {
                 return lowest
+            }
+            if self.provider == .antigravity {
+                return Meter(id: Self.unavailableGeminiSummaryID, title: "Gemini quota", shortTitle: "gemini",
+                             value: .unavailable(reason: "Not reported"))
             }
         }
         return self.meters.first(where: \.isAvailable) ?? self.meters.first

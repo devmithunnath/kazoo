@@ -64,6 +64,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             if let meter = self.store.reading(for: favorite)?.summaryMeter {
                 let compact: String = switch meter.value {
                 case .remainingPercent: "\(meter.gauge?.percent ?? 0)%"
+                case .unavailable: ValueFormatter.compact(for: meter)
                 default: ValueFormatter.numeral(for: meter)
                 }
                 title = " \(favorite.shortName) \(compact)"
